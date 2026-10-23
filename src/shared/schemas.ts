@@ -146,6 +146,13 @@ export const passwordSchema = z
   .max(200)
   .refine((v) => /[a-zA-Z]/.test(v) && /[0-9]/.test(v), "Include letters and numbers");
 
+export const adminSetupSchema = z.object({
+  setupToken: z.string().min(1, "Enter the setup code").max(200),
+  name: reqText(80),
+  email: z.string().trim().toLowerCase().pipe(z.email("Enter a valid email")),
+  password: passwordSchema,
+});
+
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1).max(200),
   newPassword: passwordSchema,

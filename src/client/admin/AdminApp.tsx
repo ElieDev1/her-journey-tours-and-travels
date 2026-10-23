@@ -5,6 +5,7 @@ import { ErrorState } from "@client/components/ui/EmptyState";
 import { useSession } from "./session";
 import { AdminLayout } from "./AdminLayout";
 import { LoginPage } from "./pages/LoginPage";
+import { SetupPage } from "./pages/SetupPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ToursPage } from "./pages/ToursPage";
 import { TourEditorPage } from "./pages/TourEditorPage";
@@ -41,6 +42,7 @@ export function AdminApp() {
   return (
     <Routes>
       <Route path="login" element={<LoginPage />} />
+      <Route path="setup" element={<SetupPage />} />
       <Route
         element={
           <RequireSession>

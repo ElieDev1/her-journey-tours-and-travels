@@ -6,6 +6,8 @@ export interface Secrets {
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
   ADMIN_NOTIFY_EMAIL?: string;
+  /** One-time code that unlocks /admin/setup while no administrator exists. */
+  ADMIN_SETUP_TOKEN?: string;
 }
 
 export interface AuthedAdmin {

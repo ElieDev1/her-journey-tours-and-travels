@@ -3,6 +3,7 @@ import type { AppEnv } from "../../env";
 import { requireAdmin } from "../../middleware/auth";
 import { sameOriginOnly } from "../../middleware/security";
 import { adminAuthRoutes } from "./auth";
+import { adminSetupRoutes } from "./setup";
 import { adminDashboardRoutes } from "./dashboard";
 import { adminTourRoutes } from "./tours";
 import { adminBookingRoutes } from "./bookings";
@@ -16,6 +17,7 @@ export const adminRoutes = new Hono<AppEnv>();
 adminRoutes.use("*", sameOriginOnly);
 // Login/logout are public; /auth/me and /auth/password authenticate themselves.
 adminRoutes.route("/", adminAuthRoutes);
+adminRoutes.route("/", adminSetupRoutes);
 
 const protectedRoutes = new Hono<AppEnv>();
 protectedRoutes.use("*", requireAdmin);

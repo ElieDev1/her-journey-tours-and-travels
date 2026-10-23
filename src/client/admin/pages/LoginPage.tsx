@@ -7,9 +7,11 @@ import { api, errorMessage, fieldErrors } from "@client/lib/api";
 import { Button } from "@client/components/ui/Button";
 import { Field, FormError, Input } from "@client/components/ui/Field";
 import { SESSION_KEY, useSession } from "../session";
+import { useSetupStatus } from "./SetupPage";
 
 export function LoginPage() {
   const session = useSession();
+  const setupStatus = useSetupStatus();
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -24,6 +26,7 @@ export function LoginPage() {
   });
   const errors = fieldErrors(login.error);
   if (session.data) return <Navigate to="/admin" replace />;
+  if (setupStatus.data?.needsSetup) return <Navigate to="/admin/setup" replace />;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-forest-700 px-4 py-12">

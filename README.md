@@ -171,7 +171,11 @@ Roles:
 
 ### Creating administrators
 
-No credentials are hard-coded. Create the first owner with:
+No credentials are hard-coded.
+
+**From the browser (no command line needed).** Add a repository secret `ADMIN_SETUP_TOKEN` (any long phrase you choose) under *Settings → Secrets and variables → Actions*. The deploy workflow copies it to the Worker. Then open `/admin/login`: while no administrator exists, it sends you to `/admin/setup`, where you enter that code plus your name, email and password to create the owner account. Once any administrator exists, the setup page is permanently disabled.
+
+**From the command line.** Create the first owner with:
 
 ```bash
 npm run admin:create -- --local                       # development
@@ -217,6 +221,7 @@ Unknown tour slugs return HTTP 404. `sitemap.xml` is built from published tours.
 | `RESEND_API_KEY` | secret | no | Enables booking and confirmation emails through [Resend](https://resend.com) |
 | `EMAIL_FROM` | secret | no | Sender, e.g. `Her Journey Tours <bookings@yourdomain.com>` |
 | `ADMIN_NOTIFY_EMAIL` | secret | no | Inbox notified when a customer submits a payment |
+| `ADMIN_SETUP_TOKEN` | secret (synced from GitHub) | for browser setup | Code that unlocks `/admin/setup` while no administrator exists |
 
 Without the email secrets the site works fully: customers see every status change on their booking page, and email is skipped.
 
