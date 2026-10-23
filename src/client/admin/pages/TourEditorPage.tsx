@@ -18,6 +18,7 @@ import { CURRENCIES, CURRENCY_CODES, formatMoney, toMajor, toMinor } from "@shar
 import { calculateQuote } from "@shared/pricing";
 import type { TourUpsertInput } from "@shared/schemas";
 import { api, errorMessage, fieldErrors } from "@client/lib/api";
+import { imageFormData, prepareImage } from "@client/lib/image";
 import { cn } from "@client/lib/cn";
 import { Button } from "@client/components/ui/Button";
 import { Checkbox, Field, FormError, Input, Select, Textarea } from "@client/components/ui/Field";
@@ -29,6 +30,7 @@ import { PageHeader, Panel } from "../components/PageHeader";
 import { ListEditor } from "../components/ListEditor";
 import { DepartureManager } from "../components/DepartureManager";
 import { ImageManager } from "../components/ImageManager";
+import { PendingImages, emptyPendingImages, pendingCount, pendingUploads, type PendingImageSet } from "../components/PendingImages";
 import { useCan } from "../session";
 
 // ---------- form model ----------
@@ -177,28 +179,50 @@ function TourEditor({ tourId, copyFrom, initial, savedTour }: { tourId: number |
   const [form, setForm] = useState<TourForm>(initial);
   const [slugTouched, setSlugTouched] = useState(!isNew);
   const [section, setSection] = useState<SectionId>("basics");
+  const [pendingImages, setPendingImages] = useState<PendingImageSet>(emptyPendingImages);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const categories = useQuery({
     queryKey: ["admin", "categories"],
     queryFn: () => api.get<{ items: CategoryDTO[] }>("/api/admin/categories"),
   });
 
   const save = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       const payload = toPayload(form);
-      return isNew ? api.post<AdminTourDTO>("/api/admin/tours", payload) : api.put<AdminTourDTO>(`/api/admin/tours/${tourId}`, payload);
+      if (!isNew) return { saved: await api.put<AdminTourDTO>(`/api/admin/tours/${tourId}`, payload), failed: 0 };
+      const saved = await api.post<AdminTourDTO>("/api/admin/tours", payload);
+      // Upload images chosen before the tour existed.
+      const uploads = pendingUploads(pendingImages);
+      let failed = 0;
+      for (const [i, { kind, file }] of uploads.entries()) {
+        setUploadProgress(`Uploading image ${i + 1} of ${uploads.length}…`);
+        try {
+          const prepared = await prepareImage(file);
+          await api.post(`/api/admin/tours/${saved.id}/images`, imageFormData(prepared, { kind, altText: `${saved.title} – ${kind === "poster" ? "poster" : "photo"}` }));
+        } catch {
+          failed++;
+        }
+      }
+      setUploadProgress(null);
+      return { saved, failed };
     },
-    onSuccess: (saved) => {
+    onSuccess: ({ saved, failed }) => {
       queryClient.setQueryData(["admin", "tour", saved.id], saved);
+      queryClient.invalidateQueries({ queryKey: ["admin", "tour", saved.id] });
       queryClient.invalidateQueries({ queryKey: ["admin", "tours"] });
       queryClient.invalidateQueries({ queryKey: ["public"] });
-      toast(isNew ? "Tour created. You can now add departures and images." : "Tour saved");
+      if (failed) toast(`Tour created, but ${failed} image(s) could not be uploaded. Add them again in Media.`, "error");
+      else toast(isNew ? "Tour created. Add departure dates under Schedule & dates." : "Tour saved");
       if (isNew) {
         navigate(`/admin/tours/${saved.id}`, { replace: true });
       } else {
         setForm(fromTour(saved));
       }
     },
-    onError: (e) => toast(errorMessage(e), "error"),
+    onError: (e) => {
+      setUploadProgress(null);
+      toast(errorMessage(e), "error");
+    },
   });
   const remove = useMutation({
     mutationFn: () => api.delete(`/api/admin/tours/${tourId}`),
@@ -273,7 +297,7 @@ function TourEditor({ tourId, copyFrom, initial, savedTour }: { tourId: number |
           savedTour ? (
             <span className="flex items-center gap-2"><TourStatusBadge status={savedTour.status} /> {savedTour.bookingCount} booking{savedTour.bookingCount === 1 ? "" : "s"} · last updated {new Date(savedTour.updatedAt).toLocaleString()}</span>
           ) : (
-            "Fill in the essentials first. You can add dates and images after saving."
+            "Fill in the essentials and choose images under Media. Departure dates can be added once the tour is created."
           )
         }
         actions={
@@ -514,7 +538,7 @@ function TourEditor({ tourId, copyFrom, initial, savedTour }: { tourId: number |
                 {savedTour ? (
                   <ImageManager tourId={savedTour.id} images={savedTour.images} canWrite={canWrite} tourTitle={savedTour.title} />
                 ) : (
-                  <p className="text-sm text-muted">Save the tour first, then upload a cover, gallery images and a poster here.</p>
+                  <PendingImages value={pendingImages} onChange={setPendingImages} />
                 )}
               </Panel>
               <Panel title="Video">
@@ -558,7 +582,12 @@ function TourEditor({ tourId, copyFrom, initial, savedTour }: { tourId: number |
 
           {canWrite && (
             <div className="sticky bottom-4 z-20 flex items-center justify-between gap-3 rounded-2xl bg-white/95 px-5 py-3 shadow-lift ring-1 ring-line backdrop-blur">
-              <p className="text-xs text-muted">{isNew ? "Required: title, slug, destination, country and adult price." : "Changes apply to the website as soon as you save."}</p>
+              <p className="text-xs text-muted">
+                {uploadProgress ??
+                  (isNew
+                    ? `Required: title, slug, destination, country and adult price.${pendingCount(pendingImages) ? ` ${pendingCount(pendingImages)} image(s) will be uploaded.` : ""}`
+                    : "Changes apply to the website as soon as you save.")}
+              </p>
               <Button type="submit" loading={save.isPending} icon={<Save className="size-4" />}>
                 {isNew ? "Create tour" : "Save changes"}
               </Button>
