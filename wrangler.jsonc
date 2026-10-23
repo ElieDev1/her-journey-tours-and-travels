@@ -1,0 +1,45 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "her-journey-tours",
+  "main": "./src/worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    // The Worker runs first for the API, uploaded media and pages that
+    // need server-side SEO metadata. Everything else is served directly.
+    "run_worker_first": [
+      "/api/*",
+      "/media/*",
+      "/tours",
+      "/tours/*",
+      "/sitemap.xml",
+      "/robots.txt",
+      "/"
+    ]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "her-journey-db",
+      // Replace with the id printed by `wrangler d1 create her-journey-db`.
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "her-journey-media"
+    }
+  ],
+  // Expire unpaid bookings and release their seats every 15 minutes.
+  "triggers": { "crons": ["*/15 * * * *"] },
+  "vars": {
+    "APP_ENV": "production",
+    "PUBLIC_SITE_URL": "https://her-journey-tours.example.workers.dev"
+  }
+}

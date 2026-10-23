@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustration of a winding trail through the countryside">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcedcc"/><stop offset="1" stop-color="#f4f8f1"/></linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#88b379"/><stop offset="1" stop-color="#43613a"/></linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+  <path d="M0 420 L260 300 L420 380 L640 250 L900 400 L1120 290 L1380 390 L1600 320 V600 H0Z" fill="#cfe0c2"/>
+  <path d="M0 500 C300 420 520 470 800 440 S1300 430 1600 470 V1000 H0Z" fill="url(#ground)"/>
+  <path d="M700 1000 C760 880 980 840 900 740 S760 620 820 520 960 470 880 448" stroke="#fbf9f4" stroke-width="40" fill="none" stroke-linecap="round"/>
+  <path d="M700 1000 C760 880 980 840 900 740 S760 620 820 520 960 470 880 448" stroke="#f3efe5" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <g fill="#1d5233">
+    <path d="M120 760 l70 -260 70 260z"/><path d="M250 800 l56 -210 56 210z"/><path d="M400 720 l44 -170 44 170z"/>
+    <path d="M1160 760 l60 -230 60 230z"/><path d="M1290 820 l80 -290 80 290z"/><path d="M1460 760 l50 -190 50 190z"/>
+  </g>
+  <g fill="#123521"><rect x="186" y="756" width="8" height="40"/><rect x="302" y="796" width="8" height="34"/><rect x="1216" y="756" width="8" height="38"/><rect x="1366" y="816" width="8" height="40"/></g>
+  <g fill="#6c9a5c"><circle cx="560" cy="600" r="34"/><circle cx="598" cy="586" r="40"/><circle cx="1030" cy="590" r="30"/><circle cx="1064" cy="604" r="24"/></g>
+  <g fill="#efb864"><circle cx="460" cy="880" r="7"/><circle cx="500" cy="905" r="6"/><circle cx="1090" cy="890" r="7"/><circle cx="1130" cy="870" r="6"/><circle cx="350" cy="930" r="6"/></g>
+</svg>

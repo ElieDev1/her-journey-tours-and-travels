@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustration of green farmland and hills at sunrise">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8db9a"/><stop offset="0.55" stop-color="#fcedcc"/><stop offset="1" stop-color="#fbf9f4"/></linearGradient>
+    <linearGradient id="far" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#afcb9c"/><stop offset="1" stop-color="#cfe0c2"/></linearGradient>
+    <linearGradient id="mid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6c9a5c"/><stop offset="1" stop-color="#88b379"/></linearGradient>
+    <linearGradient id="near" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a6640"/><stop offset="1" stop-color="#17432a"/></linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff6dd" stop-opacity="0.9"/><stop offset="1" stop-color="#fff6dd" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+  <circle cx="980" cy="390" r="260" fill="url(#glow)"/>
+  <circle cx="980" cy="400" r="92" fill="#efb864"/>
+  <g stroke="#efb864" stroke-width="14" stroke-linecap="round">
+    <path d="M980 250v-48"/><path d="M1078 290l30-36"/><path d="M882 290l-30-36"/><path d="M1122 380l46-12"/><path d="M838 380l-46-12"/>
+  </g>
+  <path d="M0 520 C200 430 360 470 520 440 S860 380 1040 450 1380 410 1600 470 V1000 H0Z" fill="url(#far)"/>
+  <path d="M0 610 C180 540 380 580 560 545 S900 520 1100 575 1400 540 1600 590 V1000 H0Z" fill="url(#mid)"/>
+  <g fill="#557c48" opacity="0.55">
+    <circle cx="300" cy="566" r="16"/><circle cx="326" cy="560" r="20"/><circle cx="1180" cy="566" r="18"/><circle cx="1206" cy="572" r="13"/><circle cx="760" cy="540" r="12"/>
+  </g>
+  <path d="M0 720 C260 640 520 690 800 650 S1300 640 1600 690 V1000 H0Z" fill="url(#near)"/>
+  <g stroke="#3d7d50" stroke-width="5" fill="none" opacity="0.7">
+    <path d="M0 790 C300 730 600 770 900 740 S1400 740 1600 770"/>
+    <path d="M0 850 C300 795 600 830 900 805 S1400 805 1600 835"/>
+    <path d="M0 910 C300 860 600 890 900 870 S1400 870 1600 900"/>
+    <path d="M0 970 C300 925 600 950 900 935 S1400 935 1600 965"/>
+  </g>
+  <path d="M640 1000 C700 900 860 860 820 790 S900 690 1000 660" stroke="#fbf9f4" stroke-width="26" fill="none" stroke-linecap="round"/>
+  <path d="M640 1000 C700 900 860 860 820 790 S900 690 1000 660" stroke="#f3efe5" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="2 22"/>
+  <g transform="translate(1210 600)">
+    <rect x="0" y="22" width="92" height="56" fill="#fbf9f4"/><path d="M-10 26 L46 -14 L102 26Z" fill="#9c5f1d"/><rect x="36" y="44" width="20" height="34" fill="#17432a"/>
+  </g>
+  <g fill="#123521"><path d="M190 700 l22 -80 22 80z"/><path d="M226 706 l18 -64 18 64z"/><rect x="209" y="700" width="6" height="18"/></g>
+</svg>

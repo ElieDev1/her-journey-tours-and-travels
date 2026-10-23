@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustration of a lake framed by rolling hills">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6efdf"/><stop offset="1" stop-color="#fbf9f4"/></linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fc2b5"/><stop offset="1" stop-color="#5d8f7f"/></linearGradient>
+    <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d7d50"/><stop offset="1" stop-color="#1d5233"/></linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+  <circle cx="420" cy="280" r="70" fill="#f3c877"/>
+  <path d="M0 470 C220 380 420 420 640 360 S1080 330 1260 400 1500 380 1600 410 V600 H0Z" fill="#afcb9c"/>
+  <path d="M0 540 C260 470 520 500 760 470 S1260 450 1600 500 V620 H0Z" fill="#88b379"/>
+  <rect y="590" width="1600" height="410" fill="url(#water)"/>
+  <g stroke="#e6efdf" stroke-width="6" stroke-linecap="round" opacity="0.7">
+    <path d="M360 660h120"/><path d="M420 700h70"/><path d="M900 680h160"/><path d="M1180 740h90"/><path d="M220 790h140"/><path d="M700 820h120"/>
+  </g>
+  <ellipse cx="420" cy="640" rx="60" ry="10" fill="#f3c877" opacity="0.6"/>
+  <path d="M0 640 C140 600 260 620 360 680 S520 820 480 1000 H0Z" fill="url(#hill)"/>
+  <path d="M1600 610 C1440 590 1320 640 1240 720 S1160 900 1200 1000 H1600Z" fill="url(#hill)"/>
+  <g fill="#123521"><path d="M90 640 l24 -90 24 90z"/><path d="M140 650 l20 -72 20 72z"/><path d="M1440 640 l26 -96 26 96z"/><path d="M1500 650 l20 -70 20 70z"/></g>
+  <path d="M780 770 l90 0 -18 22 -54 0z" fill="#9c5f1d"/><path d="M822 770 v-58 l34 50z" fill="#fbf9f4"/>
+</svg>

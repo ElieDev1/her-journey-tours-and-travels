@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 1200" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustrated Rwandan hills at sunrise with a winding road">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#123521"/><stop offset="0.55" stop-color="#1d5233"/><stop offset="1" stop-color="#3d7d50"/></linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#efb864" stop-opacity="0.55"/><stop offset="1" stop-color="#efb864" stop-opacity="0"/></radialGradient>
+    <linearGradient id="h1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#557c48"/><stop offset="1" stop-color="#2a6640"/></linearGradient>
+    <linearGradient id="h2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a6640"/><stop offset="1" stop-color="#17432a"/></linearGradient>
+    <linearGradient id="h3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#17432a"/><stop offset="1" stop-color="#0a1f13"/></linearGradient>
+  </defs>
+  <rect width="2400" height="1200" fill="url(#sky)"/>
+  <circle cx="1700" cy="560" r="420" fill="url(#glow)"/>
+  <path d="M1590 560 a110 110 0 0 1 220 0" fill="none" stroke="#efb864" stroke-width="22" stroke-linecap="round"/>
+  <g stroke="#efb864" stroke-width="18" stroke-linecap="round">
+    <path d="M1700 400 l-6 -56"/><path d="M1806 438 l30 -42"/><path d="M1594 438 l-34 -36"/><path d="M1860 540 l52 -12"/><path d="M1540 540 l-52 -6"/>
+  </g>
+  <path d="M0 700 C260 600 520 650 760 600 S1240 520 1520 600 2080 560 2400 620 V1200 H0Z" fill="url(#h1)" opacity="0.9"/>
+  <path d="M0 800 C300 720 640 770 980 720 S1600 700 1900 760 2240 720 2400 750 V1200 H0Z" fill="url(#h2)"/>
+  <path d="M0 930 C360 860 760 900 1160 860 S1900 870 2400 900 V1200 H0Z" fill="url(#h3)"/>
+  <path d="M1080 1200 C1140 1080 1400 1040 1320 940 S1380 800 1560 760 1660 700 1660 700" stroke="#fbf9f4" stroke-opacity="0.9" stroke-width="18" fill="none" stroke-linecap="round"/>
+  <path d="M1080 1200 C1140 1080 1400 1040 1320 940 S1380 800 1560 760 1660 700 1660 700" stroke="#1d5233" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="3 26"/>
+  <g fill="#0a1f13" opacity="0.8">
+    <path d="M300 900 l40 -150 40 150z"/><path d="M370 910 l30 -110 30 110z"/><path d="M2060 880 l44 -170 44 170z"/><path d="M2140 900 l30 -110 30 110z"/>
+  </g>
+</svg>

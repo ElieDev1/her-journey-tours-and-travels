@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/*
+ * Her Journey design tokens, derived from the official logo:
+ *   primary   forest green  #1D5233  (logo background)
+ *   secondary sage green    #88B379  ("Tours and Travels")
+ *   accent    sun gold      #EFB864  (rising sun)
+ *   neutral   white / warm ivory surfaces, green-tinted ink for text
+ */
+@theme {
+  --color-forest-50: #f1f7f2;
+  --color-forest-100: #dcebdf;
+  --color-forest-200: #b9d7c0;
+  --color-forest-300: #8dbd99;
+  --color-forest-400: #5e9c6e;
+  --color-forest-500: #3d7d50;
+  --color-forest-600: #2a6640;
+  --color-forest-700: #1d5233;
+  --color-forest-800: #17432a;
+  --color-forest-900: #123521;
+  --color-forest-950: #0a1f13;
+
+  --color-sage-50: #f4f8f1;
+  --color-sage-100: #e6efdf;
+  --color-sage-200: #cfe0c2;
+  --color-sage-300: #afcb9c;
+  --color-sage-400: #88b379;
+  --color-sage-500: #6c9a5c;
+  --color-sage-600: #557c48;
+  --color-sage-700: #43613a;
+
+  --color-sun-50: #fef8ec;
+  --color-sun-100: #fcedcc;
+  --color-sun-200: #f8db9a;
+  --color-sun-300: #f3c877;
+  --color-sun-400: #efb864;
+  --color-sun-500: #e09b3a;
+  --color-sun-600: #c47d24;
+  --color-sun-700: #9c5f1d;
+
+  --color-ivory: #fbf9f4;
+  --color-sand: #f3efe5;
+  --color-ink: #1b2620;
+  --color-muted: #5b6a61;
+  --color-line: #e3e0d6;
+
+  --color-danger-50: #fef3f2;
+  --color-danger-600: #b42318;
+  --color-danger-700: #912018;
+  --color-info-50: #eff6fb;
+  --color-info-600: #2e6f95;
+
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", ui-serif, Georgia, serif;
+
+  --shadow-card: 0 1px 2px rgb(18 53 33 / 0.06), 0 8px 24px -12px rgb(18 53 33 / 0.18);
+  --shadow-lift: 0 2px 4px rgb(18 53 33 / 0.08), 0 18px 40px -16px rgb(18 53 33 / 0.28);
+
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-fade-in: fade-in 0.3s ease-out both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-ivory text-ink font-sans;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display text-forest-900;
+    letter-spacing: -0.01em;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-sun-500;
+  }
+  ::selection {
+    @apply bg-sun-200 text-forest-950;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold tracking-[0.2em] uppercase text-sage-600;
+  }
+  .prose-tour p + p {
+    @apply mt-4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
