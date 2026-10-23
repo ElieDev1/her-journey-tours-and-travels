@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "her-journey-tours",
+  "name": "her-journey-tours-and-travels",
   "main": "./src/worker/index.ts",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
@@ -25,8 +25,7 @@
     {
       "binding": "DB",
       "database_name": "her-journey-db",
-      // Replace with the id printed by `wrangler d1 create her-journey-db`.
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "662067b4-e048-454b-9a4e-fad160d711d3",
       "migrations_dir": "migrations"
     }
   ],
@@ -40,6 +39,8 @@
   "triggers": { "crons": ["*/15 * * * *"] },
   "vars": {
     "APP_ENV": "production",
-    "PUBLIC_SITE_URL": "https://her-journey-tours.example.workers.dev"
+    // Leave empty to use the address the site is served from. Set it to your
+    // custom domain (e.g. "https://herjourneytours.rw") once you have one.
+    "PUBLIC_SITE_URL": ""
   }
 }
