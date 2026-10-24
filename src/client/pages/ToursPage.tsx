@@ -65,7 +65,7 @@ export function ToursPage() {
       <section className="bg-forest-700 pt-16 pb-24 text-white">
         <div className="container-page">
           <p className="eyebrow text-sun-300">Explore</p>
-          <h1 className="mt-2 text-5xl font-semibold text-white sm:text-6xl">Find your next journey</h1>
+          <h1 className="mt-2 text-4xl font-bold text-white sm:text-5xl">Find your next journey</h1>
           <p className="mt-4 max-w-xl text-forest-100">Search scheduled trips by destination, date and budget. Every tour shows live seat availability.</p>
           <form
             role="search"

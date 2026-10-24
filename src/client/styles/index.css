@@ -51,7 +51,6 @@
   --color-info-600: #2e6f95;
 
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Cormorant Garamond", ui-serif, Georgia, serif;
 
   --shadow-card: 0 1px 2px rgb(18 53 33 / 0.06), 0 8px 24px -12px rgb(18 53 33 / 0.18);
   --shadow-lift: 0 2px 4px rgb(18 53 33 / 0.08), 0 18px 40px -16px rgb(18 53 33 / 0.28);
@@ -90,8 +89,8 @@
   h1,
   h2,
   h3 {
-    @apply font-display text-forest-900;
-    letter-spacing: -0.01em;
+    @apply text-forest-900;
+    letter-spacing: -0.02em;
   }
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-sun-500;

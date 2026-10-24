@@ -242,7 +242,7 @@ seoRoutes.get("/sitemap.xml", async (c) => {
 seoRoutes.get("/robots.txt", (c) => {
   const origin = siteOrigin(c);
   return c.text(
-    `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /booking/\n\nSitemap: ${origin}/sitemap.xml\n`,
+    `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /booking/\nDisallow: /account\n\nSitemap: ${origin}/sitemap.xml\n`,
     200,
     { "cache-control": "public, max-age=86400" },
   );

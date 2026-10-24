@@ -36,7 +36,7 @@ The colours come from the official logo and are defined once as tokens in `src/c
 | `ivory` / `sand` | `#FBF9F4` / `#F3EFE5` | (neutral) | page and section backgrounds |
 | `ink` | `#1B2620` | (neutral) | body text |
 
-Each brand colour has a full 50–950 scale. The logo is used unmodified. The header, footer and admin sidebar use a tightly cropped copy of the original image on a matching green surface. The favicon uses the emblem from the same image. Fonts are Cormorant Garamond (display) and Inter (text), self-hosted through Fontsource.
+Each brand colour has a full 50–950 scale. The logo is used unmodified. The header, footer and admin sidebar use a tightly cropped copy of the original image on a matching green surface. The favicon uses the emblem from the same image. The whole site uses one typeface, Inter, self-hosted through Fontsource.
 
 ## Project structure
 

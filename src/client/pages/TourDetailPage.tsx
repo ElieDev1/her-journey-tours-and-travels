@@ -49,7 +49,7 @@ const DIFFICULTY_LABEL = { easy: "Easy", moderate: "Moderate", challenging: "Cha
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section id={id} className="scroll-mt-32 border-t border-line pt-10">
-      <h2 className="text-3xl font-semibold">{title}</h2>
+      <h2 className="text-2xl font-bold">{title}</h2>
       <div className="mt-5">{children}</div>
     </section>
   );
@@ -109,7 +109,7 @@ function BookingCard({ tour, selectedId, onSelect }: { tour: TourDetailDTO; sele
       <div className="flex items-end justify-between gap-3">
         <div>
           <p className="text-xs font-medium text-muted">From</p>
-          <p className="font-display text-4xl font-semibold text-forest-900">{formatMoney(price.adult, cur)}</p>
+          <p className="text-3xl font-bold text-forest-900">{formatMoney(price.adult, cur)}</p>
           {price.adult < price.base && <p className="text-sm text-muted line-through">{formatMoney(price.base, cur)}</p>}
           <p className="text-xs text-muted">{tour.pricing.pricingBasis === "per_person" ? "per person" : "per group"}</p>
         </div>
@@ -269,7 +269,7 @@ export function TourDetailPage() {
               {tour.isFeatured && <Badge tone="gold">Featured</Badge>}
               {tour.isPopular && <Badge tone="green">Popular</Badge>}
             </div>
-            <h1 className="mt-3 text-4xl leading-tight font-semibold sm:text-5xl lg:text-6xl">{tour.title}</h1>
+            <h1 className="mt-3 text-3xl leading-tight font-bold sm:text-4xl lg:text-5xl">{tour.title}</h1>
             <p className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
               <span className="inline-flex items-center gap-1.5"><MapPin className="size-4 text-sage-500" />{tour.destination}, {tour.country}</span>
               {tour.rating && (

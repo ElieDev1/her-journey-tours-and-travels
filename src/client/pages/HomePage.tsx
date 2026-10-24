@@ -83,7 +83,7 @@ function ContactSection() {
       <div className="container-page grid gap-12 lg:grid-cols-2">
         <div>
           <p className="eyebrow">Talk to us</p>
-          <h2 className="mt-2 text-4xl font-semibold sm:text-5xl">Plan your next journey with us</h2>
+          <h2 className="mt-2 text-3xl font-bold sm:text-4xl">Plan your next journey with us</h2>
           <p className="mt-4 max-w-lg text-muted">
             Questions about a trip, a private group or a special request? Call, send a WhatsApp message or email us. We are happy to help.
           </p>
@@ -168,7 +168,7 @@ export function HomePage() {
         <div className="container-page flex min-h-[78vh] flex-col justify-center py-24 lg:min-h-[640px]">
           <div className="max-w-2xl animate-fade-up">
             <p className="eyebrow text-sun-300">{settings?.companyName ?? "Her Journey Tours and Travels"}</p>
-            <h1 className="mt-4 text-5xl leading-[1.02] font-semibold text-white sm:text-6xl lg:text-7xl">
+            <h1 className="mt-4 text-4xl leading-tight font-bold text-white sm:text-5xl lg:text-6xl">
               {settings?.heroTitle ?? "Discover Rwanda, one unforgettable journey at a time"}
             </h1>
             {settings?.heroSubtitle && <p className="mt-6 max-w-xl text-lg leading-relaxed text-forest-100">{settings.heroSubtitle}</p>}
@@ -231,11 +231,11 @@ export function HomePage() {
                       <li key={departure.id} className="group relative grid items-center gap-5 bg-white p-5 transition-colors hover:bg-forest-50/50 sm:grid-cols-[auto_1fr_auto] sm:p-6">
                         <div className="flex size-20 flex-col items-center justify-center rounded-2xl bg-forest-700 text-white">
                           <span className="text-[0.65rem] font-semibold tracking-wider text-sun-300 uppercase">{parts.month}</span>
-                          <span className="font-display text-3xl leading-none font-semibold">{parts.day}</span>
+                          <span className="text-2xl leading-none font-bold">{parts.day}</span>
                           <span className="text-[0.65rem] text-forest-200">{parts.weekday}</span>
                         </div>
                         <div>
-                          <h3 className="text-2xl font-semibold">
+                          <h3 className="text-lg font-bold">
                             <Link to={`/tours/${tour.slug}`} className="after:absolute after:inset-0">{tour.title}</Link>
                           </h3>
                           <p className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
@@ -277,7 +277,7 @@ export function HomePage() {
                       </div>
                       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-forest-950/85 via-forest-950/20 to-transparent" />
                       <p className="text-xs font-semibold tracking-[0.2em] text-sun-300 uppercase">{d.country}</p>
-                      <h3 className="mt-1 text-2xl font-semibold text-white">{d.destination}</h3>
+                      <h3 className="mt-1 text-xl font-bold text-white">{d.destination}</h3>
                       <p className="mt-1 text-sm text-forest-100">{d.tourCount} tour{d.tourCount === 1 ? "" : "s"}</p>
                     </Link>
                   ))}
@@ -290,7 +290,7 @@ export function HomePage() {
           <section className="bg-forest-700 py-20 text-white sm:py-24">
             <div className="container-page">
               <p className="eyebrow text-sage-300">Tour categories</p>
-              <h2 className="mt-2 text-4xl font-semibold text-white sm:text-5xl">Find your kind of journey</h2>
+              <h2 className="mt-2 text-3xl font-bold text-white sm:text-4xl">Find your kind of journey</h2>
               <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {data.categories.map((cat) => (
                   <Link
@@ -344,7 +344,7 @@ export function HomePage() {
                         ))}
                       </div>
                       {r.title && <p className="mt-4 font-semibold text-forest-900">{r.title}</p>}
-                      <blockquote className="mt-2 flex-1 font-display text-xl leading-snug text-forest-900">“{r.body}”</blockquote>
+                      <blockquote className="mt-2 flex-1 text-base leading-relaxed text-forest-900">“{r.body}”</blockquote>
                       <figcaption className="mt-6 text-sm">
                         <span className="font-semibold text-forest-800">{r.authorName}</span>
                         {r.authorLocation && <span className="text-muted"> · {r.authorLocation}</span>}

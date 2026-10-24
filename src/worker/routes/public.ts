@@ -25,6 +25,7 @@ import {
 } from "../services/bookings";
 import { submitPayment } from "../services/payments";
 import { sendEmail } from "../services/email";
+import { currentCustomer } from "../services/customerAuth";
 
 export const publicRoutes = new Hono<AppEnv>();
 
@@ -198,12 +199,15 @@ publicRoutes.post("/bookings", async (c) => {
 
   // Free seats held by abandoned bookings before checking availability.
   await expireStaleBookings(db, c.env.DB, 50);
+  // Bookings made while signed in appear under the traveller's account.
+  const customer = await currentCustomer(c, db);
   const { booking, accessToken } = await createBooking(
     db,
     c.env.DB,
     input,
     settings.bookingHoldMinutes,
     settings.momoPayCode,
+    customer?.id ?? null,
   );
 
   const view = await toPublicBooking(db, booking, settings);

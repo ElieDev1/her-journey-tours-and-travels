@@ -9,6 +9,8 @@ import { BookingStatusPage } from "./pages/BookingStatusPage";
 import { BookingLookupPage } from "./pages/BookingLookupPage";
 import { ContactPage } from "./pages/ContactPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { LoginPage, RegisterPage } from "./pages/AuthPages";
+import { AccountPage } from "./pages/AccountPage";
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +29,9 @@ export const router = createBrowserRouter([
       { path: "booking/lookup", Component: BookingLookupPage },
       { path: "booking/:reference", Component: BookingStatusPage },
       { path: "contact", Component: ContactPage },
+      { path: "login", Component: LoginPage },
+      { path: "register", Component: RegisterPage },
+      { path: "account", Component: AccountPage },
       { path: "*", Component: NotFoundPage },
     ],
   },

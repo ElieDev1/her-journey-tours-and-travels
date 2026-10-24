@@ -238,6 +238,34 @@ export const tourDepartures = sqliteTable(
   ],
 );
 
+export const customers = sqliteTable("customers", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  email: text("email").notNull().unique(),
+  fullName: text("full_name").notNull(),
+  phone: text("phone"),
+  passwordHash: text("password_hash").notNull(),
+  failedLoginCount: integer("failed_login_count").notNull().default(0),
+  lockedUntil: text("locked_until"),
+  lastLoginAt: text("last_login_at"),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+export const customerSessions = sqliteTable(
+  "customer_sessions",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    customerId: integer("customer_id")
+      .notNull()
+      .references(() => customers.id, { onDelete: "cascade" }),
+    // SHA-256 of the session token; the raw token only lives in the cookie.
+    tokenHash: text("token_hash").notNull().unique(),
+    expiresAt: text("expires_at").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("customer_sessions_customer_idx").on(t.customerId), index("customer_sessions_expires_idx").on(t.expiresAt)],
+);
+
 export const bookings = sqliteTable(
   "bookings",
   {
@@ -250,6 +278,8 @@ export const bookings = sqliteTable(
     departureId: integer("departure_id")
       .notNull()
       .references(() => tourDepartures.id, { onDelete: "restrict" }),
+    // Set when the booking was made while signed in to a customer account.
+    customerId: integer("customer_id").references(() => customers.id, { onDelete: "set null" }),
     customerName: text("customer_name").notNull(),
     customerEmail: text("customer_email").notNull(),
     customerPhone: text("customer_phone").notNull(),
@@ -280,6 +310,7 @@ export const bookings = sqliteTable(
     index("bookings_departure_idx").on(t.departureId),
     index("bookings_tour_idx").on(t.tourId),
     index("bookings_email_idx").on(t.customerEmail),
+    index("bookings_customer_idx").on(t.customerId),
     index("bookings_created_idx").on(t.createdAt),
     check("bookings_guests_check", sql`${t.adults} >= 0 AND ${t.children} >= 0 AND ${t.totalGuests} >= 1`),
   ],

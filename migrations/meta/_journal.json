@@ -15,6 +15,13 @@
       "when": 1792780562533,
       "tag": "0001_seed_initial_data",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1792817259038,
+      "tag": "0002_customer_accounts",
+      "breakpoints": true
     }
   ]
 }

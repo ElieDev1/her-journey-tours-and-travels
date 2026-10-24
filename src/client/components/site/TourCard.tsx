@@ -30,14 +30,14 @@ export function TourCard({ tour }: { tour: TourCardDTO }) {
         {dep && (
           <div className="absolute right-4 bottom-4 rounded-2xl bg-white/95 px-3 py-2 text-center shadow-card backdrop-blur">
             <p className="text-[0.65rem] font-semibold tracking-wider text-sage-600 uppercase">{dateParts(dep.startDate).month}</p>
-            <p className="font-display text-2xl leading-none font-semibold text-forest-900">{dateParts(dep.startDate).day}</p>
+            <p className="text-xl leading-none font-bold text-forest-900">{dateParts(dep.startDate).day}</p>
           </div>
         )}
       </div>
 
       <div className="flex flex-1 flex-col p-6">
         {tour.category && <p className="eyebrow">{tour.category.name}</p>}
-        <h3 className="mt-2 text-2xl leading-tight font-semibold">
+        <h3 className="mt-2 text-xl leading-snug font-bold">
           <Link to={`/tours/${tour.slug}`} className="after:absolute after:inset-0 hover:text-forest-700">
             {tour.title}
           </Link>

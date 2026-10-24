@@ -397,3 +397,33 @@ export const tourListQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(48).default(12),
 });
 export type TourListQuery = z.output<typeof tourListQuerySchema>;
+
+// ---------- customer accounts ----------
+
+export const customerPasswordSchema = z
+  .string()
+  .min(8, "Use at least 8 characters")
+  .max(200)
+  .refine((v) => /[a-zA-Z]/.test(v) && /[0-9]/.test(v), "Include letters and numbers");
+
+export const customerRegisterSchema = z.object({
+  fullName: reqText(120),
+  email: z.string().trim().toLowerCase().pipe(z.email("Enter a valid email")),
+  phone: optPhone,
+  password: customerPasswordSchema,
+});
+
+export const customerLoginSchema = z.object({
+  email: z.string().trim().toLowerCase().pipe(z.email("Enter a valid email")),
+  password: z.string().min(1, "Required").max(200),
+});
+
+export const customerProfileSchema = z.object({
+  fullName: reqText(120),
+  phone: optPhone,
+});
+
+export const customerPasswordChangeSchema = z.object({
+  currentPassword: z.string().min(1, "Required").max(200),
+  newPassword: customerPasswordSchema,
+});

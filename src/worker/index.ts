@@ -5,11 +5,13 @@ import { HttpError } from "./lib/http";
 import { securityHeaders } from "./middleware/security";
 import { publicRoutes } from "./routes/public";
 import { adminRoutes } from "./routes/admin";
+import { accountRoutes } from "./routes/account";
 import { seoRoutes } from "./routes/seo";
 import { serveMedia } from "./services/media";
 import { expireStaleBookings } from "./services/bookings";
 import { pruneRateLimits } from "./services/rateLimit";
 import { pruneSessions } from "./services/auth";
+import { pruneCustomerSessions } from "./services/customerAuth";
 
 const app = new Hono<AppEnv>();
 
@@ -25,6 +27,7 @@ app.get("/api/health", async (c) => {
 });
 app.route("/api/public", publicRoutes);
 app.route("/api/admin", adminRoutes);
+app.route("/api/account", accountRoutes);
 app.all("/api/*", (c) => c.json({ error: "Not found" }, 404));
 
 app.get("/media/*", (c) => serveMedia(c.env.MEDIA, c.req.path.slice("/media/".length), c.req.raw));
@@ -49,7 +52,7 @@ export default {
     ctx.waitUntil(
       (async () => {
         const expired = await expireStaleBookings(db, env.DB, 500);
-        await Promise.all([pruneRateLimits(db), pruneSessions(db)]);
+        await Promise.all([pruneRateLimits(db), pruneSessions(db), pruneCustomerSessions(db)]);
         console.log("scheduled_maintenance", { expired });
       })(),
     );

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, CalendarDays, Clock, MapPin, Minus, Plus, ShieldCheck } from "lucide-react";
 import type { BookingCreatedDTO, TourDetailDTO } from "@shared/types";
 import { formatMoney } from "@shared/money";
@@ -9,6 +9,7 @@ import { formatDate, formatTime } from "@shared/time";
 import { api, errorMessage, fieldErrors } from "@client/lib/api";
 import { useDocumentMeta } from "@client/lib/useDocumentMeta";
 import { useSettings } from "@client/hooks/useSettings";
+import { useCustomer } from "@client/hooks/useCustomer";
 import { cn } from "@client/lib/cn";
 import { Button, ButtonLink } from "@client/components/ui/Button";
 import { Checkbox, Field, FormError, Input, Textarea } from "@client/components/ui/Field";
@@ -42,6 +43,8 @@ export function BookingPage() {
   const { slug = "" } = useParams();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryClient = useQueryClient();
   const { data: settings } = useSettings();
   const query = useQuery({
     queryKey: ["public", "tour", slug],
@@ -53,6 +56,18 @@ export function BookingPage() {
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [form, setForm] = useState({ customerName: "", customerEmail: "", customerPhone: "", specialRequests: "" });
+  // Fill in a signed-in traveller's details once, without overwriting anything typed.
+  const { data: customer } = useCustomer();
+  const [prefilledFor, setPrefilledFor] = useState<number | null>(null);
+  if (customer && prefilledFor !== customer.id) {
+    setPrefilledFor(customer.id);
+    setForm((f) => ({
+      ...f,
+      customerName: f.customerName || customer.fullName,
+      customerEmail: f.customerEmail || customer.email,
+      customerPhone: f.customerPhone || (customer.phone ?? ""),
+    }));
+  }
   const [guestNames, setGuestNames] = useState<string[]>([]);
   const [acceptTerms, setAcceptTerms] = useState(false);
 
@@ -89,7 +104,10 @@ export function BookingPage() {
         guestNames: guestNames.slice(0, totalGuests - 1).filter((n) => n.trim()),
         acceptTerms,
       }),
-    onSuccess: (res) => navigate(`/booking/${res.reference}?t=${encodeURIComponent(res.accessToken)}`, { replace: true }),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["account", "bookings"] });
+      navigate(`/booking/${res.reference}?t=${encodeURIComponent(res.accessToken)}`, { replace: true });
+    },
   });
   const errors = fieldErrors(create.error);
 
@@ -112,7 +130,7 @@ export function BookingPage() {
       <Link to={`/tours/${tour.slug}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-forest-700 hover:underline">
         <ArrowLeft className="size-4" /> Back to tour
       </Link>
-      <h1 className="mt-4 text-4xl font-semibold sm:text-5xl">Book your trip</h1>
+      <h1 className="mt-4 text-3xl font-bold sm:text-4xl">Book your trip</h1>
       <p className="mt-2 text-muted">Reserve your seats now and pay with MoMo Pay. Your booking is confirmed once we verify your payment.</p>
 
       <form
@@ -174,6 +192,13 @@ export function BookingPage() {
 
           <section>
             <h2 className="font-sans text-lg font-semibold text-forest-900">3. Your details</h2>
+            {customer === null && (
+              <p className="mt-2 text-sm text-muted">
+                Have an account?{" "}
+                <Link to="/login" state={{ from: `${location.pathname}${location.search}` }} className="font-semibold text-forest-700 underline underline-offset-4">Log in</Link>{" "}
+                to fill this in and keep the booking in your account. Or continue as a guest.
+              </p>
+            )}
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <Field label="Full name" required error={errors.customerName} className="sm:col-span-2">
                 {(p) => <Input {...p} autoComplete="name" value={form.customerName} onChange={(e) => setForm({ ...form, customerName: e.target.value })} maxLength={120} required />}
@@ -248,7 +273,7 @@ export function BookingPage() {
                 </dl>
                 <div className="mt-4 flex items-end justify-between border-t border-line pt-4">
                   <span className="text-sm font-semibold text-forest-900">Total ({totalGuests} guest{totalGuests === 1 ? "" : "s"})</span>
-                  <span className="font-display text-3xl font-semibold text-forest-900">{formatMoney(quote.totalAmount, cur)}</span>
+                  <span className="text-2xl font-bold text-forest-900">{formatMoney(quote.totalAmount, cur)}</span>
                 </div>
               </div>
             )}

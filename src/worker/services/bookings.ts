@@ -139,6 +139,7 @@ export async function createBooking(
   input: BookingCreate,
   holdMinutes: number,
   merchantCode: string,
+  customerId: number | null = null,
 ): Promise<{ booking: BookingRow; accessToken: string }> {
   const row = await db
     .select({ departure: tourDepartures, tour: tours })
@@ -184,18 +185,18 @@ export async function createBooking(
     // 1) Insert the booking only if the departure still has room.
     const insertBooking = d1
       .prepare(
-        `INSERT INTO bookings (reference, access_token_hash, tour_id, departure_id, customer_name, customer_email,
+        `INSERT INTO bookings (reference, access_token_hash, tour_id, departure_id, customer_id, customer_name, customer_email,
             customer_phone, adults, children, total_guests, special_requests, currency, adult_unit_price,
             child_unit_price, discount_amount, fees_amount, total_amount, status, seats_held, expires_at,
             created_at, updated_at)
-         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending_payment', 1, ?, ?, ?
+         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending_payment', 1, ?, ?, ?
          WHERE EXISTS (
            SELECT 1 FROM tour_departures
            WHERE id = ? AND status = 'scheduled'
              AND (seat_capacity IS NULL OR seats_reserved + ? <= seat_capacity))`,
       )
       .bind(
-        reference, tokenHash, tour.id, departure.id, input.customerName, input.customerEmail,
+        reference, tokenHash, tour.id, departure.id, customerId, input.customerName, input.customerEmail,
         input.customerPhone, input.adults, input.children, totalGuests, input.specialRequests,
         quote.currency, quote.adultUnitPrice, quote.childUnitPrice, quote.discountAmount,
         quote.feesAmount, quote.totalAmount, expiresAt, createdAt, createdAt,

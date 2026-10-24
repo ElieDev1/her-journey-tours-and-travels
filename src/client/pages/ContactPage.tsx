@@ -28,7 +28,7 @@ export function ContactPage() {
       <section className="bg-forest-700 py-20 text-white">
         <div className="container-page">
           <p className="eyebrow text-sun-300">Contact</p>
-          <h1 className="mt-2 text-5xl font-semibold text-white sm:text-6xl">We'd love to hear from you</h1>
+          <h1 className="mt-2 text-4xl font-bold text-white sm:text-5xl">We'd love to hear from you</h1>
           <p className="mt-4 max-w-xl text-forest-100">Questions about a tour, group bookings or payments? Reach us by phone, WhatsApp or email.</p>
         </div>
       </section>

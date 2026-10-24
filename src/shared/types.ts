@@ -406,3 +406,26 @@ export interface AdminSettingsDTO {
 }
 
 export type { Quote };
+
+export interface CustomerDTO {
+  id: number;
+  email: string;
+  fullName: string;
+  phone: string | null;
+  createdAt: string;
+}
+
+export interface CustomerBookingDTO {
+  reference: string;
+  status: BookingStatus;
+  tourTitle: string;
+  tourSlug: string;
+  departureDate: string;
+  totalGuests: number;
+  totalAmount: number;
+  currency: string;
+  amountPaid: number;
+  /** Email on the booking; the booking page uses it to open the booking. */
+  bookingEmail: string;
+  createdAt: string;
+}

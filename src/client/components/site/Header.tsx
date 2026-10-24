@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router";
-import { Menu, Phone, X } from "lucide-react";
+import { LogOut, Menu, Phone, UserRound, X } from "lucide-react";
+import { useCustomer, useLogout } from "@client/hooks/useCustomer";
 import { cn } from "@client/lib/cn";
 import { useSettings } from "@client/hooks/useSettings";
 import { formatPhone, telHref } from "@client/lib/contact";
@@ -19,6 +20,8 @@ export function Header() {
   const { pathname } = useLocation();
   const [menuPath, setMenuPath] = useState(pathname);
   const { data: settings } = useSettings();
+  const { data: customer } = useCustomer();
+  const logout = useLogout();
   // Close the mobile menu whenever the route changes.
   if (menuPath !== pathname) {
     setMenuPath(pathname);
@@ -50,12 +53,27 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 lg:flex">
+        <div className="hidden items-center gap-3 lg:flex">
           {settings?.phonePrimary && (
-            <a href={telHref(settings.phonePrimary)} className="flex items-center gap-2 text-sm text-forest-100 hover:text-white">
+            <a href={telHref(settings.phonePrimary)} className="hidden items-center gap-2 text-sm text-forest-100 hover:text-white xl:flex">
               <Phone className="size-4 text-sun-400" />
               {formatPhone(settings.phonePrimary)}
             </a>
+          )}
+          {customer ? (
+            <Link to="/account" className="flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-white ring-1 ring-white/30 hover:bg-white/10">
+              <UserRound className="size-4 text-sun-400" />
+              {customer.fullName.split(" ")[0]}
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" state={{ from: pathname }} className="rounded-full px-3 py-2 text-sm font-medium text-white hover:bg-white/10">
+                Log in
+              </Link>
+              <Link to="/register" state={{ from: pathname }} className="rounded-full px-4 py-2 text-sm font-medium text-white ring-1 ring-white/40 hover:bg-white/10">
+                Sign up
+              </Link>
+            </>
           )}
           <ButtonLink to="/tours" variant="accent">
             Book a Tour
@@ -93,6 +111,27 @@ export function Header() {
                 <Phone className="size-4 text-sun-400" /> {formatPhone(settings.phonePrimary)}
               </a>
             )}
+            <div className="mt-2 border-t border-white/10 pt-3">
+              {customer ? (
+                <>
+                  <NavLink to="/account" className="flex items-center gap-2 rounded-xl px-4 py-3 text-base font-medium text-forest-100">
+                    <UserRound className="size-4 text-sun-400" /> My account ({customer.fullName.split(" ")[0]})
+                  </NavLink>
+                  <button onClick={() => logout.mutate()} className="flex w-full items-center gap-2 rounded-xl px-4 py-3 text-left text-base font-medium text-forest-100">
+                    <LogOut className="size-4 text-sun-400" /> Log out
+                  </button>
+                </>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 px-1">
+                  <Link to="/login" state={{ from: pathname }} className="rounded-full px-4 py-2.5 text-center text-sm font-semibold text-white ring-1 ring-white/40">
+                    Log in
+                  </Link>
+                  <Link to="/register" state={{ from: pathname }} className="rounded-full bg-white px-4 py-2.5 text-center text-sm font-semibold text-forest-800">
+                    Sign up
+                  </Link>
+                </div>
+              )}
+            </div>
             <ButtonLink to="/tours" variant="accent" className="mt-2">
               Book a Tour
             </ButtonLink>

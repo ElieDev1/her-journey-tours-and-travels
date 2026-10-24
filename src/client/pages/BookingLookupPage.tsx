@@ -25,7 +25,7 @@ export function BookingLookupPage() {
     <div className="container-page flex justify-center py-20">
       <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-lift ring-1 ring-line/60">
         <span className="inline-flex rounded-2xl bg-forest-50 p-3 text-forest-700"><Search className="size-6" /></span>
-        <h1 className="mt-5 text-4xl font-semibold">Find my booking</h1>
+        <h1 className="mt-5 text-3xl font-bold">Find my booking</h1>
         <p className="mt-2 text-sm text-muted">Enter the reference from your booking (for example HJ-7K3QX9) and the email you booked with.</p>
         <form
           className="mt-8 space-y-4"
