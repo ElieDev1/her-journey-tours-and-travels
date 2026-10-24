@@ -10,7 +10,7 @@ import { useDocumentMeta } from "@client/lib/useDocumentMeta";
 import { cn } from "@client/lib/cn";
 import { CUSTOMER_KEY, useCustomer, useLogout } from "@client/hooks/useCustomer";
 import { Button, ButtonLink } from "@client/components/ui/Button";
-import { BookingStatusBadge } from "@client/components/ui/Badge";
+import { Badge, BookingStatusBadge } from "@client/components/ui/Badge";
 import { Field, FormError, Input } from "@client/components/ui/Field";
 import { EmptyState, ErrorState } from "@client/components/ui/EmptyState";
 import { PageLoader } from "@client/components/ui/Spinner";
@@ -68,6 +68,14 @@ function ProfileTab({ customer }: { customer: CustomerDTO }) {
   return (
     <form className="max-w-lg space-y-4 rounded-3xl bg-white p-6 shadow-card ring-1 ring-line/60" onSubmit={(e) => { e.preventDefault(); save.mutate(); }}>
       <Field label="Email" hint="Contact us if you need to change your email.">{(p) => <Input {...p} value={customer.email} disabled />}</Field>
+      <div>
+        <p className="mb-1.5 text-sm font-medium text-forest-900">Sign-in methods</p>
+        <div className="flex flex-wrap gap-2">
+          {customer.hasPassword && <Badge tone="green">Email &amp; password</Badge>}
+          {customer.hasGoogle && <Badge tone="blue">Google</Badge>}
+          {customer.emailVerified && <Badge tone="sage">Email verified</Badge>}
+        </div>
+      </div>
       <Field label="Full name" required error={errors.fullName}>{(p) => <Input {...p} value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} required />}</Field>
       <Field label="Phone number" error={errors.phone}>{(p) => <Input {...p} type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />}</Field>
       <FormError message={save.isError && !Object.keys(errors).length ? errorMessage(save.error) : null} />
@@ -76,22 +84,35 @@ function ProfileTab({ customer }: { customer: CustomerDTO }) {
   );
 }
 
-function PasswordTab() {
+function PasswordTab({ customer }: { customer: CustomerDTO }) {
   const toast = useToast();
+  const queryClient = useQueryClient();
   const [form, setForm] = useState({ currentPassword: "", newPassword: "", confirm: "" });
   const change = useMutation({
-    mutationFn: () => api.post("/api/account/password", { currentPassword: form.currentPassword, newPassword: form.newPassword }),
-    onSuccess: () => { setForm({ currentPassword: "", newPassword: "", confirm: "" }); toast("Password changed. Other devices were logged out."); },
+    mutationFn: () =>
+      api.post("/api/account/password", {
+        ...(customer.hasPassword ? { currentPassword: form.currentPassword } : {}),
+        newPassword: form.newPassword,
+      }),
+    onSuccess: () => {
+      setForm({ currentPassword: "", newPassword: "", confirm: "" });
+      queryClient.setQueryData(CUSTOMER_KEY, { ...customer, hasPassword: true });
+      toast(customer.hasPassword ? "Password changed. You were signed out on other devices." : "Password set. You can now also log in with your email.");
+    },
   });
   const errors = fieldErrors(change.error);
   const mismatch = form.confirm.length > 0 && form.confirm !== form.newPassword;
   return (
     <form className="max-w-lg space-y-4 rounded-3xl bg-white p-6 shadow-card ring-1 ring-line/60" onSubmit={(e) => { e.preventDefault(); if (!mismatch) change.mutate(); }}>
-      <Field label="Current password" required error={errors.currentPassword}>{(p) => <Input {...p} type="password" autoComplete="current-password" value={form.currentPassword} onChange={(e) => setForm({ ...form, currentPassword: e.target.value })} required />}</Field>
+      {customer.hasPassword ? (
+        <Field label="Current password" required error={errors.currentPassword}>{(p) => <Input {...p} type="password" autoComplete="current-password" value={form.currentPassword} onChange={(e) => setForm({ ...form, currentPassword: e.target.value })} required />}</Field>
+      ) : (
+        <p className="rounded-2xl bg-ivory p-4 text-sm text-muted">You sign in with Google. Set a password if you'd also like to log in with your email address.</p>
+      )}
       <Field label="New password" required error={errors.newPassword} hint="At least 8 characters, with letters and numbers.">{(p) => <Input {...p} type="password" autoComplete="new-password" value={form.newPassword} onChange={(e) => setForm({ ...form, newPassword: e.target.value })} required />}</Field>
       <Field label="Confirm new password" required error={mismatch ? "Passwords do not match" : undefined}>{(p) => <Input {...p} type="password" autoComplete="new-password" value={form.confirm} onChange={(e) => setForm({ ...form, confirm: e.target.value })} required />}</Field>
       <FormError message={change.isError && !Object.keys(errors).length ? errorMessage(change.error) : null} />
-      <Button type="submit" loading={change.isPending}>Change password</Button>
+      <Button type="submit" loading={change.isPending}>{customer.hasPassword ? "Change password" : "Set password"}</Button>
     </form>
   );
 }
@@ -136,7 +157,7 @@ export function AccountPage() {
       <div className="mt-8">
         {tab === "bookings" && <BookingsTab />}
         {tab === "profile" && <ProfileTab customer={customer} />}
-        {tab === "password" && <PasswordTab />}
+        {tab === "password" && <PasswordTab customer={customer} />}
       </div>
     </div>
   );

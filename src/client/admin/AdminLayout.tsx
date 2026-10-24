@@ -14,6 +14,7 @@ import {
   ScrollText,
   Settings,
   UserCog,
+  UserRound,
   Users,
   Wallet,
   X,
@@ -30,9 +31,10 @@ const nav: Array<{ to: string; label: string; icon: typeof Map; end?: boolean; p
   { to: "/admin/categories", label: "Categories", icon: FolderTree },
   { to: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
   { to: "/admin/payments", label: "Payments", icon: Wallet },
+  { to: "/admin/users", label: "Users", icon: UserRound },
   { to: "/admin/reviews", label: "Reviews", icon: MessageSquareQuote },
   { to: "/admin/settings", label: "Site settings", icon: Settings },
-  { to: "/admin/users", label: "Administrators", icon: Users, permission: "users:manage" },
+  { to: "/admin/administrators", label: "Administrators", icon: Users, permission: "users:manage" },
   { to: "/admin/audit", label: "Audit log", icon: ScrollText, permission: "audit:read" },
 ];
 

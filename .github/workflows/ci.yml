@@ -1,0 +1,29 @@
+name: CI
+
+# Checks only. The live site is deployed by Cloudflare Workers Builds from the
+# claude/kind-knuth-4ktp7x branch (it applies D1 migrations, then deploys).
+on:
+  pull_request:
+  push:
+    branches: [main, claude/kind-knuth-4ktp7x]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build
+      # Verify the migrations apply cleanly to a fresh database.
+      - run: npx wrangler d1 migrations apply DB --local

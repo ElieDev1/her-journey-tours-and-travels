@@ -61,6 +61,12 @@ export async function login(c: Context<AppEnv>, db: Database, email: string, pas
     throw invalid;
   }
 
+  await createAdminSession(c, db, user);
+  return user;
+}
+
+/** Start an admin session for an already-authenticated, active admin. */
+export async function createAdminSession(c: Context<AppEnv>, db: Database, user: typeof adminUsers.$inferSelect): Promise<void> {
   const token = randomToken(32);
   const now = Date.now();
   await db.batch([
@@ -76,6 +82,7 @@ export async function login(c: Context<AppEnv>, db: Database, email: string, pas
       .set({ failedLoginCount: 0, lockedUntil: null, lastLoginAt: new Date(now).toISOString() })
       .where(eq(adminUsers.id, user.id)),
   ]);
+  user.lastLoginAt = new Date(now).toISOString();
 
   setCookie(c, cookieName(c), token, {
     httpOnly: true,
@@ -84,7 +91,6 @@ export async function login(c: Context<AppEnv>, db: Database, email: string, pas
     path: "/",
     maxAge: SESSION_ABSOLUTE_MS / 1000,
   });
-  return user;
 }
 
 export async function logout(c: Context<AppEnv>, db: Database): Promise<void> {

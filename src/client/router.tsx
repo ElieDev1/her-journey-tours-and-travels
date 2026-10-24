@@ -9,8 +9,7 @@ import { BookingStatusPage } from "./pages/BookingStatusPage";
 import { BookingLookupPage } from "./pages/BookingLookupPage";
 import { ContactPage } from "./pages/ContactPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
-import { LoginPage, RegisterPage } from "./pages/AuthPages";
-import { AccountPage } from "./pages/AccountPage";
+import { ForgotPasswordPage, LoginPage, RegisterPage, ResetPasswordPage } from "./pages/AuthPages";
 
 export const router = createBrowserRouter([
   {
@@ -31,7 +30,12 @@ export const router = createBrowserRouter([
       { path: "contact", Component: ContactPage },
       { path: "login", Component: LoginPage },
       { path: "register", Component: RegisterPage },
-      { path: "account", Component: AccountPage },
+      // Loaded on demand to keep the main bundle small.
+      { path: "account", lazy: async () => ({ Component: (await import("./pages/AccountPage")).AccountPage }), HydrateFallback: PageLoader },
+      { path: "forgot-password", Component: ForgotPasswordPage },
+      { path: "reset-password", Component: ResetPasswordPage },
+      { path: "privacy", lazy: async () => ({ Component: (await import("./pages/LegalPages")).PrivacyPage }), HydrateFallback: PageLoader },
+      { path: "terms", lazy: async () => ({ Component: (await import("./pages/LegalPages")).TermsPage }), HydrateFallback: PageLoader },
       { path: "*", Component: NotFoundPage },
     ],
   },

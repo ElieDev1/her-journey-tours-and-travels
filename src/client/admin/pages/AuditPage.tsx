@@ -10,11 +10,12 @@ import { ErrorState } from "@client/components/ui/EmptyState";
 import { PageLoader } from "@client/components/ui/Spinner";
 import { PageHeader, Td, Th } from "../components/PageHeader";
 
-const ENTITY_TYPES = ["booking", "tour", "departure", "category", "review", "settings", "admin_user"];
+const ENTITY_TYPES = ["booking", "tour", "departure", "category", "review", "settings", "admin_user", "customer"];
 
 function entityLink(log: AuditLogDTO) {
   if (!log.entityId) return log.entityType;
   if (log.entityType === "booking") return <Link className="text-forest-700 hover:underline" to={`/admin/bookings/${log.entityId}`}>booking #{log.entityId}</Link>;
+  if (log.entityType === "customer") return <Link className="text-forest-700 hover:underline" to={`/admin/users/${log.entityId}`}>user #{log.entityId}</Link>;
   if (log.entityType === "tour") return <Link className="text-forest-700 hover:underline" to={`/admin/tours/${log.entityId}`}>tour #{log.entityId}</Link>;
   return `${log.entityType} #${log.entityId}`;
 }

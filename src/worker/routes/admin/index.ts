@@ -11,6 +11,7 @@ import { adminPaymentRoutes } from "./payments";
 import { adminContentRoutes } from "./content";
 import { adminUserRoutes } from "./users";
 import { adminAuditRoutes } from "./audit";
+import { adminCustomerRoutes } from "./customers";
 
 export const adminRoutes = new Hono<AppEnv>();
 
@@ -28,4 +29,5 @@ protectedRoutes.route("/", adminPaymentRoutes);
 protectedRoutes.route("/", adminContentRoutes);
 protectedRoutes.route("/", adminUserRoutes);
 protectedRoutes.route("/", adminAuditRoutes);
+protectedRoutes.route("/", adminCustomerRoutes);
 adminRoutes.route("/", protectedRoutes);

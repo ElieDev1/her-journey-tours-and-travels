@@ -231,6 +231,8 @@ seoRoutes.get("/sitemap.xml", async (c) => {
     { loc: `${origin}/`, priority: "1.0" },
     { loc: `${origin}/tours`, priority: "0.9" },
     { loc: `${origin}/contact`, priority: "0.5" },
+    { loc: `${origin}/privacy`, priority: "0.2" },
+    { loc: `${origin}/terms`, priority: "0.2" },
     ...rows.map((r) => ({ loc: `${origin}/tours/${r.slug}`, lastmod: r.updatedAt.slice(0, 10), priority: "0.8" })),
   ];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
@@ -242,7 +244,7 @@ seoRoutes.get("/sitemap.xml", async (c) => {
 seoRoutes.get("/robots.txt", (c) => {
   const origin = siteOrigin(c);
   return c.text(
-    `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /booking/\nDisallow: /account\n\nSitemap: ${origin}/sitemap.xml\n`,
+    `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /booking/\nDisallow: /account\nDisallow: /reset-password\n\nSitemap: ${origin}/sitemap.xml\n`,
     200,
     { "cache-control": "public, max-age=86400" },
   );

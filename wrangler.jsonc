@@ -37,10 +37,22 @@
   ],
   // Expire unpaid bookings and release their seats every 15 minutes.
   "triggers": { "crons": ["*/15 * * * *"] },
+  // Transactional email (password resets, booking confirmations) through
+  // Cloudflare Email Sending. herjourney.rw must be onboarded under
+  // Email Service > Email Sending; see README "Email".
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "allowed_sender_addresses": ["noreply@herjourney.rw"]
+    }
+  ],
   "vars": {
     "APP_ENV": "production",
-    // Leave empty to use the address the site is served from. Set it to your
-    // custom domain (e.g. "https://herjourneytours.rw") once you have one.
-    "PUBLIC_SITE_URL": ""
+    // Canonical origin for SEO tags, the sitemap and links in emails.
+    "PUBLIC_SITE_URL": "https://herjourney.rw",
+    "EMAIL_FROM": "noreply@herjourney.rw",
+    "EMAIL_FROM_NAME": "Her Journey Tours and Travels",
+    // Public OAuth client id. GOOGLE_CLIENT_SECRET is a Worker secret.
+    "GOOGLE_CLIENT_ID": "785941978620-bv1tb1m35bvl5uf8k3hndkl8j036tgle.apps.googleusercontent.com"
   }
 }

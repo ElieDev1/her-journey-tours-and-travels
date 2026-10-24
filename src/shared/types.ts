@@ -412,7 +412,16 @@ export interface CustomerDTO {
   email: string;
   fullName: string;
   phone: string | null;
+  hasPassword: boolean;
+  hasGoogle: boolean;
+  emailVerified: boolean;
   createdAt: string;
+}
+
+/** Which optional sign-in features are available, so the UI can hide the rest. */
+export interface AuthConfigDTO {
+  google: boolean;
+  passwordReset: boolean;
 }
 
 export interface CustomerBookingDTO {
@@ -428,4 +437,25 @@ export interface CustomerBookingDTO {
   /** Email on the booking; the booking page uses it to open the booking. */
   bookingEmail: string;
   createdAt: string;
+}
+
+export interface AdminCustomerRowDTO {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string | null;
+  hasPassword: boolean;
+  hasGoogle: boolean;
+  emailVerified: boolean;
+  disabledAt: string | null;
+  disabledReason: string | null;
+  bookingCount: number;
+  lastLoginAt: string | null;
+  createdAt: string;
+}
+
+export interface AdminCustomerDetailDTO extends AdminCustomerRowDTO {
+  bookings: AdminBookingRowDTO[];
+  payments: AdminPaymentRowDTO[];
+  history: AuditLogDTO[];
 }

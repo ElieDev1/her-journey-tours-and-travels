@@ -21,7 +21,24 @@ function cookieName(c: Context<AppEnv>): string {
 }
 
 export function customerToDTO(u: CustomerRow): CustomerDTO {
-  return { id: u.id, email: u.email, fullName: u.fullName, phone: u.phone, createdAt: u.createdAt };
+  return {
+    id: u.id,
+    email: u.email,
+    fullName: u.fullName,
+    phone: u.phone,
+    hasPassword: u.passwordHash !== "",
+    hasGoogle: u.googleSub !== null,
+    emailVerified: u.emailVerifiedAt !== null,
+    createdAt: u.createdAt,
+  };
+}
+
+export const accountDisabled = () =>
+  new HttpError(403, "This account has been disabled. Please contact us if you think this is a mistake.");
+
+/** End every session of a customer (after a password change, reset or disable). */
+export async function endAllCustomerSessions(db: Database, customerId: number): Promise<void> {
+  await db.delete(customerSessions).where(eq(customerSessions.customerId, customerId));
 }
 
 /** Start a session for a customer and set the session cookie. */
@@ -49,7 +66,9 @@ export async function registerCustomer(
 ): Promise<CustomerRow> {
   const exists = await db.select({ id: customers.id }).from(customers).where(eq(customers.email, input.email)).get();
   if (exists) {
-    throw new HttpError(409, "An account with this email already exists. Log in instead.", { email: "Already registered" });
+    throw new HttpError(409, "An account with this email already exists. Log in, or continue with Google.", {
+      email: "Already registered",
+    });
   }
   const row = await db
     .insert(customers)
@@ -82,6 +101,8 @@ export async function loginCustomer(c: Context<AppEnv>, db: Database, email: str
       .where(eq(customers.id, user.id));
     throw invalid;
   }
+  // Checked only after the password is correct, so this reveals nothing to guessers.
+  if (user.disabledAt) throw accountDisabled();
   await db.update(customers).set({ failedLoginCount: 0, lockedUntil: null, lastLoginAt: nowIso() }).where(eq(customers.id, user.id));
   await startCustomerSession(c, db, user.id);
   return user;
@@ -103,7 +124,9 @@ export async function currentCustomer(c: Context<AppEnv>, db: Database): Promise
     .innerJoin(customers, eq(customerSessions.customerId, customers.id))
     .where(and(eq(customerSessions.tokenHash, await sha256Hex(token)), gt(customerSessions.expiresAt, nowIso())))
     .get();
-  return row?.customer ?? null;
+  // A disabled account's sessions are deleted when it is disabled; this is a backstop.
+  if (!row || row.customer.disabledAt) return null;
+  return row.customer;
 }
 
 export async function requireCustomer(c: Context<AppEnv>, db: Database): Promise<CustomerRow> {
@@ -114,4 +137,8 @@ export async function requireCustomer(c: Context<AppEnv>, db: Database): Promise
 
 export async function pruneCustomerSessions(db: Database): Promise<void> {
   await db.delete(customerSessions).where(lt(customerSessions.expiresAt, nowIso()));
+}
+
+export function sessionCookieToken(c: Context<AppEnv>): string | undefined {
+  return getCookie(c, cookieName(c));
 }

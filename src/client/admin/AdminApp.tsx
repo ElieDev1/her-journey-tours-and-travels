@@ -16,6 +16,8 @@ import { PaymentsPage } from "./pages/PaymentsPage";
 import { ReviewsPage } from "./pages/ReviewsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { UsersPage } from "./pages/UsersPage";
+import { CustomersPage } from "./pages/CustomersPage";
+import { CustomerDetailPage } from "./pages/CustomerDetailPage";
 import { AuditPage } from "./pages/AuditPage";
 import { AccountPage } from "./pages/AccountPage";
 
@@ -60,7 +62,9 @@ export function AdminApp() {
         <Route path="payments" element={<PaymentsPage />} />
         <Route path="reviews" element={<ReviewsPage />} />
         <Route path="settings" element={<SettingsPage />} />
-        <Route path="users" element={<UsersPage />} />
+        <Route path="users" element={<CustomersPage />} />
+        <Route path="users/:id" element={<CustomerDetailPage />} />
+        <Route path="administrators" element={<UsersPage />} />
         <Route path="audit" element={<AuditPage />} />
         <Route path="account" element={<AccountPage />} />
         <Route path="*" element={<Navigate to="/admin" replace />} />

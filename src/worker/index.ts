@@ -6,6 +6,7 @@ import { securityHeaders } from "./middleware/security";
 import { publicRoutes } from "./routes/public";
 import { adminRoutes } from "./routes/admin";
 import { accountRoutes } from "./routes/account";
+import { authRoutes } from "./routes/auth";
 import { seoRoutes } from "./routes/seo";
 import { serveMedia } from "./services/media";
 import { expireStaleBookings } from "./services/bookings";
@@ -28,6 +29,7 @@ app.get("/api/health", async (c) => {
 app.route("/api/public", publicRoutes);
 app.route("/api/admin", adminRoutes);
 app.route("/api/account", accountRoutes);
+app.route("/api/auth", authRoutes);
 app.all("/api/*", (c) => c.json({ error: "Not found" }, 404));
 
 app.get("/media/*", (c) => serveMedia(c.env.MEDIA, c.req.path.slice("/media/".length), c.req.raw));

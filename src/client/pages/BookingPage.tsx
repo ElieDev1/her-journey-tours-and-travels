@@ -18,6 +18,7 @@ import { EmptyState, ErrorState } from "@client/components/ui/EmptyState";
 import { PageLoader } from "@client/components/ui/Spinner";
 import { availabilityText } from "@client/components/site/TourCard";
 import { TourImage } from "@client/components/site/TourImage";
+import { GoogleButton } from "@client/components/site/GoogleButton";
 
 function Stepper({ label, hint, value, min, max, onChange }: { label: string; hint: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
   return (
@@ -193,11 +194,13 @@ export function BookingPage() {
           <section>
             <h2 className="font-sans text-lg font-semibold text-forest-900">3. Your details</h2>
             {customer === null && (
-              <p className="mt-2 text-sm text-muted">
-                Have an account?{" "}
-                <Link to="/login" state={{ from: `${location.pathname}${location.search}` }} className="font-semibold text-forest-700 underline underline-offset-4">Log in</Link>{" "}
-                to fill this in and keep the booking in your account. Or continue as a guest.
-              </p>
+              <div className="mt-3 flex flex-col gap-3 rounded-2xl bg-ivory p-4 ring-1 ring-line/70 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-muted">
+                  <Link to="/login" state={{ from: `${location.pathname}${location.search}` }} className="font-semibold text-forest-700 underline underline-offset-4">Log in</Link>{" "}
+                  to fill this in and keep the booking in your account, or continue as a guest.
+                </p>
+                <GoogleButton returnTo={`${location.pathname}${location.search}`} className="h-10 sm:w-auto" />
+              </div>
             )}
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <Field label="Full name" required error={errors.customerName} className="sm:col-span-2">

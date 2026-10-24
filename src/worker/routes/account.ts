@@ -1,12 +1,14 @@
 import { Hono } from "hono";
-import { and, desc, eq, ne } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import type { AppEnv } from "../env";
-import { bookings, customerSessions, customers, tourDepartures, tours } from "../db/schema";
+import { bookings, customers, tourDepartures, tours } from "../db/schema";
 import { HttpError, clientIp, parseJson } from "../lib/http";
 import { sameOriginOnly } from "../middleware/security";
 import {
   customerLoginSchema,
   customerPasswordChangeSchema,
+  passwordForgotSchema,
+  passwordResetSchema,
   customerProfileSchema,
   customerRegisterSchema,
 } from "../../shared/schemas";
@@ -14,15 +16,17 @@ import type { CustomerBookingDTO } from "../../shared/types";
 import { hashPassword, sha256Hex, verifyPassword } from "../lib/crypto";
 import { enforceRateLimit } from "../services/rateLimit";
 import { verifiedTotalSql } from "../services/bookings";
+import { requestPasswordReset, resetPassword } from "../services/passwordReset";
 import {
   currentCustomer,
   customerToDTO,
+  endAllCustomerSessions,
+  startCustomerSession,
   loginCustomer,
   logoutCustomer,
   registerCustomer,
   requireCustomer,
 } from "../services/customerAuth";
-import { getCookie } from "hono/cookie";
 
 /** Traveller accounts: sign up, log in, profile and "my bookings". */
 export const accountRoutes = new Hono<AppEnv>();
@@ -67,16 +71,39 @@ accountRoutes.post("/password", async (c) => {
   const me = await requireCustomer(c, db);
   await enforceRateLimit(db, `customer-password:${me.id}`, 5, 900);
   const input = await parseJson(c, customerPasswordChangeSchema);
-  if (!(await verifyPassword(input.currentPassword, me.passwordHash))) {
+  // Accounts created with Google have no password yet and may set one directly.
+  if (me.passwordHash && !(await verifyPassword(input.currentPassword ?? "", me.passwordHash))) {
     throw new HttpError(400, "Your current password is incorrect", { currentPassword: "Incorrect password" });
   }
   await db.update(customers).set({ passwordHash: await hashPassword(input.newPassword) }).where(eq(customers.id, me.id));
-  // Sign out every other device.
-  const name = c.env.APP_ENV === "development" ? "hj_session" : "__Host-hj_session";
-  const token = getCookie(c, name) ?? "";
-  await db
-    .delete(customerSessions)
-    .where(and(eq(customerSessions.customerId, me.id), ne(customerSessions.tokenHash, await sha256Hex(token))));
+  // End every session, then keep this device signed in with a fresh one.
+  await endAllCustomerSessions(db, me.id);
+  await startCustomerSession(c, db, me.id);
+  return c.json({ ok: true });
+});
+
+accountRoutes.post("/password/forgot", async (c) => {
+  const db = c.get("db");
+  const ip = clientIp(c);
+  await enforceRateLimit(db, `pw-forgot-ip:${ip}`, 10, 900);
+  const { email } = await parseJson(c, passwordForgotSchema);
+  // Per-address limit, keyed by a hash so addresses are not stored in plain text.
+  await enforceRateLimit(db, `pw-forgot-email:${await sha256Hex(email)}`, 3, 3600);
+  const origin = c.env.PUBLIC_SITE_URL || new URL(c.req.url).origin;
+  // Sent in the background so the response time doesn't reveal whether the account exists.
+  c.executionCtx.waitUntil(
+    requestPasswordReset(c.env, db, email, origin.replace(/\/$/, ""), ip).catch((err) =>
+      console.error("password_reset_request_failed", { error: String(err) }),
+    ),
+  );
+  return c.json({ ok: true });
+});
+
+accountRoutes.post("/password/reset", async (c) => {
+  const db = c.get("db");
+  await enforceRateLimit(db, `pw-reset:${clientIp(c)}`, 10, 900);
+  const { token, newPassword } = await parseJson(c, passwordResetSchema);
+  await resetPassword(db, token, newPassword);
   return c.json({ ok: true });
 });
 

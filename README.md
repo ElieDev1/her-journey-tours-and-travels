@@ -22,7 +22,7 @@ There is no separate server to host.
 | Database | Cloudflare D1 (SQLite) with Drizzle ORM and Drizzle Kit migrations |
 | Media | Cloudflare R2 |
 | Validation | Zod (schemas shared by client and server) |
-| Build/deploy | `@cloudflare/vite-plugin`, Wrangler, GitHub Actions |
+| Build/deploy | `@cloudflare/vite-plugin`, Wrangler, Cloudflare Workers Builds (deploy), GitHub Actions (checks) |
 
 ## Brand system
 
@@ -95,7 +95,7 @@ npm run dev                          # http://localhost:5173
 
 ## Database
 
-Tables: `tours`, `tour_categories`, `tour_departures`, `tour_images`, `tour_list_items`, `bookings`, `booking_guests`, `payments`, `admin_users`, `admin_sessions`, `site_settings`, `tour_reviews`, `audit_logs`, `rate_limits`.
+Tables: `tours`, `tour_categories`, `tour_departures`, `tour_images`, `tour_list_items`, `bookings`, `booking_guests`, `payments`, `customers`, `customer_sessions`, `password_reset_tokens`, `admin_users`, `admin_sessions`, `site_settings`, `tour_reviews`, `audit_logs`, `rate_limits`.
 
 Design notes:
 
@@ -159,15 +159,16 @@ Go to `/admin`. Features:
 - **Bookings:** search and filter by tour, departure date and status. Detail view shows guests, payments and history. Staff can confirm, cancel, add notes and record cash or phone payments. Bookings export to CSV.
 - **Payments:** search by transaction ID; verify, reject or refund; view revenue.
 - **Site settings:** contact details, MoMo code, seat hold time, homepage hero text and image, social links.
-- **Administrators** (owners only) and the **Audit log**.
+- **Users:** traveller accounts with search by name, email or phone, status and sign-in method filters, and pagination. A user's page shows their bookings, payments and account history. Owners and managers can disable or re-enable an account (disabling signs the user out everywhere and voids any pending reset link) and export users to CSV. Every action is audit-logged.
+- **Administrators** (owners only, at `/admin/administrators`) and the **Audit log**.
 
 Roles:
 
 | Role | Can do |
 | --- | --- |
 | Owner | Everything, including managing administrators and settings |
-| Manager | Tours, bookings, payments (verify and refund), content, audit log |
-| Staff | Bookings and payment verification |
+| Manager | Tours, bookings, payments (verify and refund), content, disabling users and user CSV export, audit log |
+| Staff | Bookings and payment verification; can view users but not disable or export them |
 
 ### Creating administrators
 
@@ -184,9 +185,39 @@ npm run admin:create -- --remote --email you@example.com --name "Your Name"   # 
 
 The script prompts for the password, hashes it locally (PBKDF2-SHA256, 100,000 iterations, the same parameters the Worker uses) and inserts only the hash through `wrangler d1 execute`. Running it again for the same email resets that password. Owners can add more administrators from the dashboard.
 
+## Traveller accounts
+
+Travellers can book as guests or with an account (`/register`, `/login`, `/account`).
+
+- **Sign in with Google** (`/api/auth/google/start` then `/api/auth/google/callback`): authorization-code flow with `state`, `nonce` and PKCE (S256), kept in a 10-minute `httpOnly` cookie. The ID token is verified with Web Crypto against Google's JWKS (RS256 signature, `iss`, `aud`, `exp`, `nonce`, `email_verified`). The redirect URI is built from the request's origin, so it works on `herjourney.rw`, `www.herjourney.rw`, the `workers.dev` host and localhost. `returnTo` only accepts paths on this site.
+  - First Google sign-in creates the account.
+  - If an account with the same email already exists, it is **linked** rather than duplicated. If that account's email had never been verified, its password and sessions are cleared when linking. Otherwise someone who registered your address first could keep access (account pre-hijacking). Verified accounts keep their password.
+  - Google never creates admins. An existing, active admin can use **Sign in with Google** on `/admin/login` when the verified Google email equals their admin email.
+  - The Google buttons are hidden unless `GOOGLE_CLIENT_ID` and the `GOOGLE_CLIENT_SECRET` secret are both set.
+- **Forgot password** (`/forgot-password`, `/reset-password`): emails a single-use link that expires in 30 minutes. Only a SHA-256 hash of the token is stored, and requesting a new link voids the old one. Requests are rate-limited (10 per IP and 3 per address per hour), and the response is identical whether or not the email exists. Completing a reset ends all of that user's sessions. Accounts created with Google can use it to set a password.
+- **Disabled accounts** cannot sign in by password, Google or session, and receive no reset emails.
+
 ## Images (R2)
 
 Uploads go to the `MEDIA` bucket under `tours/<id>/…` and `site/…`. They are served by the Worker at `/media/<key>` with immutable caching. The server checks file signatures (magic bytes), not the declared content type, and accepts only JPEG, PNG, WebP or AVIF up to 8 MB. Replacing or removing an image deletes the old object. Images are never stored in D1.
+
+## Email
+
+Password resets and booking emails are sent through **Cloudflare Email Sending** via the `EMAIL` (`send_email`) binding in `wrangler.jsonc`, from `noreply@herjourney.rw`. If that fails and a `RESEND_API_KEY` secret exists, [Resend](https://resend.com) is used instead. Email is best effort: failures are logged (`email_send_failed` in Workers Logs) and never break a booking. When no email method is configured, the forgot-password page tells travellers to contact you instead.
+
+To switch it on for herjourney.rw (the zone is already on this Cloudflare account):
+
+1. Make sure the account is on the **Workers Paid** plan. Sending to arbitrary recipients requires it.
+2. In the dashboard go to **Compute → Email Service → Email Sending → Onboard Domain** and choose `herjourney.rw` (or run `npx wrangler email sending enable herjourney.rw`).
+3. Accept the DNS records Cloudflare proposes. It adds them for you because the zone is on Cloudflare:
+   - **SPF** (TXT) and **MX** records on the `cf-bounce.herjourney.rw` bounce subdomain;
+   - a **DKIM** TXT record (Cloudflare's selector, under `._domainkey.herjourney.rw`);
+   - a **DMARC** TXT record at `_dmarc.herjourney.rw`, if you don't have one.
+
+   If herjourney.rw already has an SPF record (for example for Google Workspace), keep a **single** SPF record and merge the includes, because two SPF records break delivery. Existing MX records for receiving mail are not affected.
+4. Wait for the records to verify (usually 5–15 minutes), then try **Forgot password** on the live site.
+
+In local development the binding is simulated. Emails are printed to the console and saved under `.wrangler/tmp/email/`.
 
 ## SEO
 
@@ -210,22 +241,25 @@ Unknown tour slugs return HTTP 404. `sitemap.xml` is built from published tours.
 - **Customer access:** customers reach their booking with an unguessable token (stored hashed) or their reference plus email. Missing bookings and wrong credentials return the same error.
 - **Headers:** CSP, HSTS, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy` and `Permissions-Policy`, set by the Worker and by `public/_headers`.
 - **Audit log:** staff actions (sign-ins, tour edits, payment verification, refunds, cancellations, exports, settings and user changes) are recorded with admin and IP.
-- **Secrets:** no secrets live in frontend code or `vars`. Optional secrets are set with `wrangler secret put`.
+- **Traveller accounts:** separate session cookie and table from admins. Passwords are hashed the same way, accounts lock after repeated failures, and sessions end on password change, reset or disable. See [Traveller accounts](#traveller-accounts) for Google sign-in and reset-link protections.
+- **Secrets:** no secrets live in frontend code or `vars`. Optional secrets are set as Worker secrets (`wrangler secret put` or the dashboard).
 
 ## Environment variables
 
 | Name | Where | Required | Purpose |
 | --- | --- | --- | --- |
-| `APP_ENV` | `vars` / `.dev.vars` | yes | `production` or `development`. Development relaxes the cookie `Secure` flag and HSTS/CSP for localhost |
-| `PUBLIC_SITE_URL` | `vars` | yes | Canonical origin for SEO tags, sitemap and email links |
-| `RESEND_API_KEY` | secret | no | Enables booking and confirmation emails through [Resend](https://resend.com) |
-| `EMAIL_FROM` | secret | no | Sender, e.g. `Her Journey Tours <bookings@yourdomain.com>` |
+| `APP_ENV` | `vars` / `.dev.vars` | yes | `production` or `development`. Development relaxes cookie `Secure` flags and HSTS/CSP for localhost |
+| `PUBLIC_SITE_URL` | `vars` | yes | Canonical origin (`https://herjourney.rw`) for SEO tags, sitemap and email links |
+| `GOOGLE_CLIENT_ID` | `vars` | for Google | Public OAuth client id (project "Her Journey Website") |
+| `GOOGLE_CLIENT_SECRET` | secret | for Google | OAuth client secret. Google buttons are hidden without it |
+| `EMAIL_FROM`, `EMAIL_FROM_NAME` | `vars` | yes | Sender address and display name for outgoing email |
+| `EMAIL` | `send_email` binding | for email | Cloudflare Email Sending (see [Email](#email)) |
+| `RESEND_API_KEY` | secret | no | Fallback email provider |
 | `ADMIN_NOTIFY_EMAIL` | secret | no | Inbox notified when a customer submits a payment |
-| `ADMIN_SETUP_TOKEN` | secret (synced from GitHub) | for browser setup | Code that unlocks `/admin/setup` while no administrator exists |
+| `ADMIN_SETUP_TOKEN` | secret | for browser setup | Unlocks `/admin/setup` while no administrator exists |
+| `DEV_GOOGLE_*_URL` | `.dev.vars` | no | Local testing only: point the Google flow at a mock. Ignored unless `APP_ENV=development` |
 
-Without the email secrets the site works fully: customers see every status change on their booking page, and email is skipped.
-
-GitHub Actions secrets: `CLOUDFLARE_API_TOKEN` (with Workers Scripts, D1 and R2 edit permissions) and `CLOUDFLARE_ACCOUNT_ID`.
+Without email configured the site still works: customers see every status change on their booking page.
 
 ## Deployment (Cloudflare)
 
@@ -244,9 +278,9 @@ GitHub Actions secrets: `CLOUDFLARE_API_TOKEN` (with Workers Scripts, D1 and R2 
 5. Optional email: `npx wrangler secret put RESEND_API_KEY` (and the other email secrets).
 6. Deploy: `npm run deploy`. Add a custom domain in the Cloudflare dashboard if needed.
 
-**Continuous deployment.** `.github/workflows/ci-deploy.yml` typechecks, lints, builds and test-applies migrations on every pull request. On a push to `main` it also applies remote D1 migrations and deploys. Add the two Cloudflare secrets to the repository first.
+**Live deployment.** The site runs at **https://herjourney.rw** (also `www.herjourney.rw` and `her-journey-tours-and-travels.her-journey.workers.dev`). **Cloudflare Workers Builds** deploys it from the `claude/kind-knuth-4ktp7x` branch with the deploy command `npx wrangler d1 migrations apply DB --remote && npx wrangler deploy`, so new migrations apply automatically on each push. Keep `main` identical to that branch. The custom domains are managed in the Cloudflare dashboard.
 
-> **Status:** this project has **not been deployed yet**. Deployment needs your Cloudflare account, plus the steps above.
+**CI.** `.github/workflows/ci.yml` only typechecks, lints, builds and test-applies migrations. It needs no secrets and does not deploy.
 
 ## Verification performed
 
@@ -256,5 +290,7 @@ Run during development against the local Workers runtime:
 - Migrations apply to a fresh D1 database.
 - **API:** booking creation, the concurrent overbooking test (10 requests, 5 seats, exactly 5 succeed), payment submission, duplicate transaction ID rejected, verify confirms the booking, reject reopens the payment window, cancel and refund release seats, CSV export, auth guard, CSRF blocking, image upload with file-signature check, R2 serving and deletion, sitemap, robots and SEO tags.
 - **Browser (Playwright):** booking a tour, submitting a payment, admin sign-in and verification, and the customer seeing "confirmed" via booking lookup. Desktop and mobile layouts were checked visually. The production preview was checked with the CSP active.
+
+- **Accounts round (Google, password reset, Users):** 47 browser checks against a local mock of Google's OAuth endpoints. The mock enforced PKCE, the exact redirect URI and the client secret, and signed real RS256 tokens. Checks covered sign-up and linking (including the pre-hijack case), conflict, cancel, tampered state, unverified email, admin Google sign-in, reset emails (single use, expiry, no account enumeration, rate limits, sessions ended), disable/enable, CSV export, audit entries and role checks. The ID-token verifier was also tested directly against forged, expired, tampered and wrong-audience tokens.
 
 There is no automated test suite in the repository yet. Adding Vitest tests for `pricing.ts` and the booking service would be a good next step.

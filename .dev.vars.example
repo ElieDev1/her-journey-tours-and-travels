@@ -1,0 +1,10 @@
+# Copy to .dev.vars for local development. Never commit .dev.vars.
+APP_ENV=development
+PUBLIC_SITE_URL=http://localhost:5173
+# Unlocks /admin/setup while no administrator exists.
+ADMIN_SETUP_TOKEN=change-me
+# Sign in with Google. Leave empty to hide the Google buttons.
+# GOOGLE_CLIENT_SECRET=
+# Optional fallback email provider (https://resend.com), used only when the
+# Cloudflare EMAIL binding cannot send.
+# RESEND_API_KEY=

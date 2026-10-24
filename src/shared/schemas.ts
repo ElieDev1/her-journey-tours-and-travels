@@ -424,6 +424,26 @@ export const customerProfileSchema = z.object({
 });
 
 export const customerPasswordChangeSchema = z.object({
-  currentPassword: z.string().min(1, "Required").max(200),
+  // Optional only for accounts that have no password yet (Google sign-in).
+  currentPassword: z.string().max(200).optional(),
   newPassword: customerPasswordSchema,
 });
+
+export const passwordForgotSchema = z.object({
+  email: z.string().trim().toLowerCase().pipe(z.email("Enter a valid email")),
+});
+
+export const passwordResetSchema = z.object({
+  token: z.string().trim().min(20).max(200),
+  newPassword: customerPasswordSchema,
+});
+
+export const adminCustomerListSchema = z.object({
+  q: z.string().trim().max(100).optional(),
+  status: z.enum(["active", "disabled"]).optional(),
+  method: z.enum(["password", "google"]).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(25),
+});
+
+export const customerDisableSchema = z.object({ reason: reqText(300) });

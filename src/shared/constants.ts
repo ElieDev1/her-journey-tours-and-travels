@@ -67,6 +67,7 @@ export const PERMISSIONS = [
   "content:write",
   "settings:write",
   "users:manage",
+  "customers:manage",
   "audit:read",
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
@@ -79,6 +80,7 @@ export const ROLE_PERMISSIONS: Record<AdminRole, readonly Permission[]> = {
     "payments:verify",
     "payments:refund",
     "content:write",
+    "customers:manage",
     "audit:read",
   ],
   staff: ["bookings:write", "payments:verify"],

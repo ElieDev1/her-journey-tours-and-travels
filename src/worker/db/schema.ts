@@ -238,18 +238,47 @@ export const tourDepartures = sqliteTable(
   ],
 );
 
-export const customers = sqliteTable("customers", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  email: text("email").notNull().unique(),
-  fullName: text("full_name").notNull(),
-  phone: text("phone"),
-  passwordHash: text("password_hash").notNull(),
-  failedLoginCount: integer("failed_login_count").notNull().default(0),
-  lockedUntil: text("locked_until"),
-  lastLoginAt: text("last_login_at"),
-  createdAt: createdAt(),
-  updatedAt: updatedAt(),
-});
+export const customers = sqliteTable(
+  "customers",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    email: text("email").notNull().unique(),
+    fullName: text("full_name").notNull(),
+    phone: text("phone"),
+    // Empty string means the account has no password (Google sign-in only).
+    passwordHash: text("password_hash").notNull(),
+    // Google account subject ("sub" claim) once Sign in with Google is linked.
+    googleSub: text("google_sub"),
+    // Set when ownership of the email is proven (Google, or a password reset link).
+    emailVerifiedAt: text("email_verified_at"),
+    // Disabled accounts cannot sign in by any method.
+    disabledAt: text("disabled_at"),
+    disabledReason: text("disabled_reason"),
+    failedLoginCount: integer("failed_login_count").notNull().default(0),
+    lockedUntil: text("locked_until"),
+    lastLoginAt: text("last_login_at"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [uniqueIndex("customers_google_sub_uq").on(t.googleSub), index("customers_created_idx").on(t.createdAt)],
+);
+
+export const passwordResetTokens = sqliteTable(
+  "password_reset_tokens",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    customerId: integer("customer_id")
+      .notNull()
+      .references(() => customers.id, { onDelete: "cascade" }),
+    // SHA-256 of the emailed token; the token itself is never stored.
+    tokenHash: text("token_hash").notNull().unique(),
+    expiresAt: text("expires_at").notNull(),
+    usedAt: text("used_at"),
+    requestIp: text("request_ip"),
+    createdAt: createdAt(),
+  },
+  (t) => [index("password_reset_tokens_customer_idx").on(t.customerId), index("password_reset_tokens_expires_idx").on(t.expiresAt)],
+);
 
 export const customerSessions = sqliteTable(
   "customer_sessions",

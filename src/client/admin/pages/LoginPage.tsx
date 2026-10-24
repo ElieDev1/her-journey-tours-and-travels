@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router";
+import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Lock } from "lucide-react";
 import type { SessionDTO } from "@shared/types";
@@ -8,10 +8,13 @@ import { Button } from "@client/components/ui/Button";
 import { Field, FormError, Input } from "@client/components/ui/Field";
 import { SESSION_KEY, useSession } from "../session";
 import { useSetupStatus } from "./SetupPage";
+import { GoogleButton, OrDivider, googleErrorMessage } from "@client/components/site/GoogleButton";
 
 export function LoginPage() {
   const session = useSession();
   const setupStatus = useSetupStatus();
+  const [params] = useSearchParams();
+  const googleError = googleErrorMessage(params.get("error"));
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -37,6 +40,11 @@ export function LoginPage() {
             <Lock className="size-4" />
             <p className="text-xs font-semibold tracking-[0.18em] uppercase">Administrator sign in</p>
           </div>
+          {googleError && <div className="mt-6"><FormError message={googleError} /></div>}
+          <div className="mt-6">
+            <GoogleButton intent="admin" returnTo={from.startsWith("/admin") && from !== "/admin/login" ? from : "/admin"} label="Sign in with Google" />
+          </div>
+          <OrDivider />
           <form
             className="mt-6 space-y-4"
             onSubmit={(e) => {

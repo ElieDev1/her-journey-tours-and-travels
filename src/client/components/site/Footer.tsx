@@ -95,7 +95,11 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="container-page flex flex-col gap-2 py-6 text-xs text-forest-300 sm:flex-row sm:items-center sm:justify-between">
           <p>© {year} {s?.companyName ?? "Her Journey Tours and Travels"}. All rights reserved.</p>
-          <p>Kigali, Rwanda</p>
+          <p className="flex flex-wrap gap-x-5 gap-y-1">
+            <Link to="/privacy" className="hover:text-white">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-white">Terms and Conditions</Link>
+            <span>Kigali, Rwanda</span>
+          </p>
         </div>
       </div>
     </footer>
