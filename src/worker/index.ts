@@ -8,6 +8,7 @@ import { adminRoutes } from "./routes/admin";
 import { accountRoutes } from "./routes/account";
 import { authRoutes } from "./routes/auth";
 import { seoRoutes } from "./routes/seo";
+import { registerSiteVerification, verificationPaths } from "./routes/siteVerification";
 import { serveMedia } from "./services/media";
 import { expireStaleBookings } from "./services/bookings";
 import { pruneRateLimits } from "./services/rateLimit";
@@ -15,6 +16,19 @@ import { pruneSessions } from "./services/auth";
 import { pruneCustomerSessions } from "./services/customerAuth";
 
 const app = new Hono<AppEnv>();
+
+// Search engine ownership files come first: no redirect, no SPA shell.
+registerSiteVerification(app);
+
+// One canonical host: www.<domain> permanently redirects to <domain>, same path and query.
+app.use("*", async (c, next) => {
+  const url = new URL(c.req.url);
+  const canonical = c.env.PUBLIC_SITE_URL ? new URL(c.env.PUBLIC_SITE_URL) : null;
+  if (canonical && url.hostname === `www.${canonical.hostname}` && !verificationPaths.has(url.pathname)) {
+    return c.redirect(`${canonical.origin}${url.pathname}${url.search}`, 301);
+  }
+  await next();
+});
 
 app.use("*", async (c, next) => {
   c.set("db", createDb(c.env.DB));

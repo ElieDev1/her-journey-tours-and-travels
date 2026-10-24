@@ -9,17 +9,10 @@
     "directory": "./dist/client",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    // The Worker runs first for the API, uploaded media and pages that
-    // need server-side SEO metadata. Everything else is served directly.
-    "run_worker_first": [
-      "/api/*",
-      "/media/*",
-      "/tours",
-      "/tours/*",
-      "/sitemap.xml",
-      "/robots.txt",
-      "/"
-    ]
+    // The Worker sees every request so it can redirect www to the apex
+    // domain, serve verification files and render SEO metadata. It hands
+    // everything else to the static assets.
+    "run_worker_first": true
   },
   "d1_databases": [
     {

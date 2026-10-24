@@ -221,14 +221,24 @@ In local development the binding is simulated. Emails are printed to the console
 
 ## SEO
 
-React with Vite is client-rendered. Rather than adopt a different framework, the Worker handles public pages itself. For `/`, `/tours` and `/tours/:slug` it streams the built `index.html` through `HTMLRewriter`, injecting:
+React with Vite is client-rendered. Rather than adopt a different framework, the Worker renders public pages itself (`src/worker/routes/seo.ts`, `src/worker/seo/`). It streams the built `index.html` through `HTMLRewriter` and injects:
 
-- a unique `<title>`, meta description and canonical URL
+- a unique `<title>`, meta description and canonical URL (always `https://herjourney.rw/...`)
 - Open Graph and Twitter tags (using the tour cover photo once one is uploaded)
-- JSON-LD (`TravelAgency`, `TouristTrip` with offers per departure, `BreadcrumbList`)
-- crawlable HTML (heading, description, price, dates and inclusions) inside `#root`, which React replaces when it loads
+- JSON-LD: `TravelAgency` on every public page (name, url, logo, telephone, email, Kigali address; `sameAs` fills from the social links in Site settings); `ItemList` of tours on `/tours`; `TouristTrip` with offers per departure and `BreadcrumbList` on tour pages
+- crawlable HTML inside `#root`, which React replaces when it loads:
+  - **Home:** who the company is, what it offers, upcoming tours with dates, prices and links, categories, published testimonials and contact details.
+  - **`/tours`:** every published tour with destination, next date, price in RWF and short description.
+  - **Tour pages:** description, dates, highlights, inclusions and exclusions.
+  - **`/contact`, `/privacy`, `/terms`:** contact details and summaries.
 
-Unknown tour slugs return HTTP 404. `sitemap.xml` is built from published tours. `robots.txt` excludes `/admin`, `/api/` and `/booking/`, and admin pages add `noindex`. Images are lazy-loaded with `srcset`. Lists are paginated and indexed.
+All of this text comes from the database and Site settings. Log-in, account, password-reset and booking pages get `noindex`, and unknown tour slugs return HTTP 404.
+
+- **`sitemap.xml`:** every URL has a `lastmod`. For a tour this is the latest change to the tour, its departures, images or published reviews. Home and `/tours` use the latest of those plus settings and categories.
+- **`robots.txt`:** excludes `/admin`, `/api/`, `/booking/`, `/account` and `/reset-password`.
+- **One canonical host:** `www.herjourney.rw` returns a **301** to `https://herjourney.rw` with the same path and query. The Worker runs first for every request (`run_worker_first: true`) so this covers all URLs.
+- **Google Search Console:** `/googleb9325a9dbac8e007.html` is served by the Worker (`src/worker/routes/siteVerification.ts`) on every host, including www, before the redirect. It returns exactly `google-site-verification: googleb9325a9dbac8e007.html`. **Never remove it**, or the Search Console property loses verification.
+- **Live check:** run the **Live SEO check** workflow (Actions tab), or `node scripts/check-live-seo.mjs https://herjourney.rw`, to verify all of the above on the live site.
 
 ## Security
 

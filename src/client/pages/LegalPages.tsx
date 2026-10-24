@@ -3,9 +3,10 @@ import { Link } from "react-router";
 import { useSettings } from "@client/hooks/useSettings";
 import { useDocumentMeta } from "@client/lib/useDocumentMeta";
 import { formatPhone } from "@client/lib/contact";
+import { LEGAL_LAST_UPDATED_LABEL } from "@shared/legal";
 
 const CONTACT_EMAIL = "info@herjourney.rw";
-const LAST_UPDATED = "24 October 2026";
+
 
 function LegalLayout({ title, intro, children }: { title: string; intro: ReactNode; children: ReactNode }) {
   return (
@@ -15,7 +16,7 @@ function LegalLayout({ title, intro, children }: { title: string; intro: ReactNo
           <p className="eyebrow text-sun-300">Legal</p>
           <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">{title}</h1>
           <p className="mt-3 max-w-2xl text-forest-100">{intro}</p>
-          <p className="mt-4 text-sm text-forest-200">Last updated: {LAST_UPDATED}</p>
+          <p className="mt-4 text-sm text-forest-200">Last updated: {LEGAL_LAST_UPDATED_LABEL}</p>
         </div>
       </section>
       <article className="container-page max-w-3xl py-14 pb-24 text-[15px] leading-relaxed text-ink/90 [&_h2]:mt-10 [&_h2]:mb-3 [&_h2]:text-xl [&_h2]:font-bold [&_li]:mt-1.5 [&_p]:mt-3 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-6">

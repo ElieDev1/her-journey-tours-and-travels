@@ -1,0 +1,22 @@
+name: Live SEO check
+
+# Run manually (Actions tab > Live SEO check > Run workflow) after a deploy
+# to confirm the live site's verification file, www redirect, crawlable
+# content, structured data and sitemap.
+on:
+  workflow_dispatch:
+    inputs:
+      origin:
+        description: Site origin to check
+        default: https://herjourney.rw
+        required: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: node scripts/check-live-seo.mjs "${{ inputs.origin }}"
