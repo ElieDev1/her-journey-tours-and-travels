@@ -24,6 +24,7 @@ import { formatPhone, telHref, whatsappHref } from "@client/lib/contact";
 import { TourCard, availabilityText } from "@client/components/site/TourCard";
 import { TourImage } from "@client/components/site/TourImage";
 import { SectionHeading } from "@client/components/site/SectionHeading";
+import { PartnerLogos, TrustSeal } from "@client/components/site/Partners";
 import { Button, ButtonLink } from "@client/components/ui/Button";
 import { Badge } from "@client/components/ui/Badge";
 import { Input, Textarea } from "@client/components/ui/Field";
@@ -326,6 +327,19 @@ export function HomePage() {
                     <p className="mt-2 text-sm leading-relaxed text-muted">{text}</p>
                   </div>
                 ))}
+              </div>
+              <div className="mt-14 grid items-center gap-8 rounded-3xl bg-white p-8 shadow-card ring-1 ring-line/60 md:grid-cols-[auto_1fr]">
+                <div className="flex items-center gap-5">
+                  <TrustSeal className="h-28" />
+                  <div>
+                    <p className="eyebrow">Verified business</p>
+                    <h3 className="mt-1 font-sans text-lg font-semibold text-forest-900">A trusted, registered company</h3>
+                  </div>
+                </div>
+                <div className="md:border-l md:border-line md:pl-8">
+                  <p className="eyebrow">Our partners</p>
+                  <PartnerLogos className="mt-4" />
+                </div>
               </div>
             </div>
           </section>

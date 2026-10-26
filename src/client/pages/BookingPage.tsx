@@ -19,6 +19,7 @@ import { PageLoader } from "@client/components/ui/Spinner";
 import { availabilityText } from "@client/components/site/TourCard";
 import { TourImage } from "@client/components/site/TourImage";
 import { GoogleButton } from "@client/components/site/GoogleButton";
+import { TrustSeal } from "@client/components/site/Partners";
 
 function Stepper({ label, hint, value, min, max, onChange }: { label: string; hint: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
   return (
@@ -296,6 +297,10 @@ export function BookingPage() {
             <p className="flex items-center justify-center gap-1.5 text-xs text-muted">
               <ShieldCheck className="size-3.5 text-forest-600" /> No payment is taken on this page
             </p>
+            <div className="flex items-center justify-center gap-3 border-t border-line pt-4">
+              <TrustSeal className="h-16" />
+              <p className="text-xs leading-snug text-muted">You are booking with a verified and trusted business.</p>
+            </div>
           </div>
         </aside>
       </form>

@@ -4,6 +4,7 @@ import { FacebookIcon, InstagramIcon, TikTokIcon } from "./SocialIcons";
 import { useSettings } from "@client/hooks/useSettings";
 import { formatPhone, telHref, whatsappHref } from "@client/lib/contact";
 import { Logo } from "./Logo";
+import { PartnerLogos, TrustSeal } from "./Partners";
 
 export function Footer() {
   const { data: s } = useSettings();
@@ -90,6 +91,18 @@ export function Footer() {
               {s.momoPayCode}
             </p>
           )}
+        </div>
+      </div>
+      <div className="border-t border-white/10">
+        <div className="container-page flex flex-col gap-6 py-8 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-sans text-sm font-semibold tracking-[0.16em] text-sage-300 uppercase">Our partners</h2>
+            <PartnerLogos className="mt-4" logoClassName="h-12" />
+          </div>
+          <div className="flex items-center gap-4">
+            <TrustSeal className="h-20 rounded-xl bg-white p-1" />
+            <p className="max-w-[12rem] text-sm leading-snug text-forest-200">Verified and trusted business</p>
+          </div>
         </div>
       </div>
       <div className="border-t border-white/10">
