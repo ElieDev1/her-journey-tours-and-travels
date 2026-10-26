@@ -7,7 +7,7 @@ const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
+  "img-src 'self' data: blob: https://media.icyuzi.rw",
   "font-src 'self' data:",
   "connect-src 'self'",
   "frame-src https://www.google.com https://www.youtube-nocookie.com https://player.vimeo.com",
